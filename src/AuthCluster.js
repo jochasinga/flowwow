@@ -17,8 +17,8 @@ const AuthCluster = () => {
     }
     return (
       <div className="buttons">
-          <a className="button is-primary" onClick={fcl.logIn}>Log In</a>
-          <a className="button is-secondary" onClick={fcl.signUp}>Sign Up</a>
+          <a className="button is-primary is-medium is-outlined is-inverted" onClick={fcl.logIn}>Log In</a>
+          <a className="button is-primary is-medium is-outlined is-inverted" onClick={fcl.signUp}>Sign Up</a>
       </div>
     );
 }
