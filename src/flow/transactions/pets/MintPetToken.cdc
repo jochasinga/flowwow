@@ -1,6 +1,6 @@
 import PetShopContract from 0xf8d6e0586b0a20c7
 
-transaction {
+transaction(metadata: {String : String}) {
     let receiverRef: &{PetShopContract.NFTReceiver}
     let minterRef: &PetShopContract.NFTMinter
 
@@ -17,16 +17,21 @@ transaction {
     }
 
     execute {
+        /*
         let metadata : {String : String} = {
-            "name": "Iggy",
+            "name": name,
             "breed": "French Bulldog",
             "sex": "Female",
             "color": "Brown",
+            "age": "1",
 
             // `ipfs` scheme is the correct reference for a file on IPFS. It can be used with
             // IPFS's desktop client and browser extension, and natively supported in Brave browser.
             "uri": "ipfs://bafkreib6sjwicehehpyeolffk7utttowgts4ic24gnxgx3pxpjbwixpyka"
         }
+        */
+        log(metadata)
+
         let newNFT <- self.minterRef.mint()
         self.receiverRef.deposit(token: <-newNFT, metadata: metadata)
         log("NFT Minted and deposited to Account 2's Collection")

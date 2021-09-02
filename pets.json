@@ -1,0 +1,76 @@
+{
+    "pets": [
+        {
+            "name": "Iggy",
+            "age": "1",
+            "breed": "French Bulldog",
+            "sex": "Male",
+            "color": "Brown",
+            "photo": "assets/1.jpg",
+            "kind": "Dog"
+        },
+        {
+            "name": "Max",
+            "age": "0.5",
+            "breed": "Corgi",
+            "sex": "M",
+            "color": "White and brown",
+            "photo": "assets/2.jpg",
+            "kind": "Dog"
+        },
+        {
+            "name": "Delphi",
+            "age": "2",
+            "breed": "Maine Coon",
+            "sex": "F",
+            "color": "White",
+            "photo": "assets/3.jpg",
+            "kind": "Cat"
+        },
+        {
+            "name": "Boris",
+            "age": "0.8",
+            "breed": "Jack Russell",
+            "sex": "M",
+            "color": "Black, brown, and white",
+            "photo": "assets/4.jpg",
+            "kind": "Dog"
+        },
+        {
+            "name": "Celo",
+            "age": "1.2",
+            "breed": "French Bulldog",
+            "sex": "M",
+            "color": "White and cream",
+            "photo": "assets/5.jpg",
+            "kind": "Dog"
+        },
+        {
+            "name": "Persiphone",
+            "age": "2",
+            "breed": "American Shorthair",
+            "sex": "F",
+            "color": "White",
+            "photo": "assets/6.jpg",
+            "kind": "Cat"
+        },
+        {
+            "name": "Dusty",
+            "age": "2",
+            "breed": "Tabby",
+            "sex": "F",
+            "color": "Dark brown/striped",
+            "photo": "assets/7.jpg",
+            "kind": "Cat"
+        },
+        {
+            "name": "Bull",
+            "age": "2",
+            "breed": "Labrador",
+            "sex": "M",
+            "color": "Black",
+            "photo": "assets/8.jpg",
+            "kind": "Dog"
+        }
+    ]
+}

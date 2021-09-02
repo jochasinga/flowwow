@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as fcl from "@onflow/fcl";
-import raw from "./cadence/scripts/CheckTokenMetadata.cdc";
+import raw from "flow/scripts/pets/CheckTokenMetadata.cdc";
 import {ipfsToWeb2Url} from "./helpers";
 
 const TokenData = () => {

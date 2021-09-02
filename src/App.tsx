@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Nav from './Nav';
-import TokenData from './TokenData';
-import './App.css';
-import './theme.scss';
+import mintPetTokens from 'flow/transactions/pets/MintPetToken.tx';
+import TokenData from 'flow/scripts/pets/TokenData';
+import 'App.css';
+import 'theme.scss';
 
 function Hero() {
   return (
@@ -29,6 +30,9 @@ function Hero() {
 
 
 function App() {
+//   useEffect(() => {
+//     mintPetTokens();
+//   }, []);
   return (
     <div className="App">
       <Hero />

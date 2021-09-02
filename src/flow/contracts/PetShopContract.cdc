@@ -16,9 +16,17 @@ pub contract PetShopContract {
     // available to others (users who are not the contract owner)
     // These are methods the NFTReceiver will be able to call.
     pub resource interface NFTReceiver {
+
+        // deposit an NFT to this NFTReceiver
         pub fun deposit(token: @NFT, metadata: {String : String})
+
+        // getIds of all NFTs belonging to this account
         pub fun getIds(): [UInt64]
+
+        // check if an NFT with an ID exists in this account
         pub fun idExists(id: UInt64): Bool
+
+        // Get metadata of an NFT
         pub fun getMetadata(id: UInt64) : {String : String}
     }
 
@@ -47,20 +55,31 @@ pub contract PetShopContract {
             self.ownedNFTs[token.id] <-! token
         }
 
+        // idExists checks to see if an NFT
+        // with the given ID exists in the collection.
         pub fun idExists(id: UInt64): Bool {
             return self.ownedNFTs[id] != nil
         }
 
+        // getIds returns an array of the IDs that are in the collection
         pub fun getIds(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
         pub fun getMetadata(id: UInt64): {String : String} {
+            // return self.ownedNFTs[id]?.metadata!
+             // let token <- self.ownedNFTs[id]!
+            // return token.metadata
             return self.metadataObjs[id]!
         }
 
         pub fun updateMetadata(id: UInt64, metadata: {String: String}) {
             self.metadataObjs[id] = metadata
+            // let token <- self.ownedNFTs[id]!
+            // token.metadata = metadata
+            // self.ownedNFTs[id] <- token
+            // self.ownedNFTs[id].metadata! = metadata
+            // self.ownedNFTs[id]?.updateMetadata(metadata: metadata)
         }
     }
 

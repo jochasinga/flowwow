@@ -1,10 +1,6 @@
 import AuthCluster from './AuthCluster';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
-import Tippy from "@tippyjs/react";
-import { roundArrow } from "tippy.js";
-import "tippy.js/dist/tippy.css";
-import 'tippy.js/themes/light.css';
 
 const Nav = () => {
   return (
@@ -14,8 +10,12 @@ const Nav = () => {
           <a className="navbar-item" href="/">
             <h1 className="title">🐶 Flowwow</h1>
           </a>
-          <a
-            role="button"
+          <div className="navbar-item">
+            <span className="tag is-light">
+              { process.env.REACT_APP_FLOW_NET }
+            </span>
+          </div>
+          <button
             className="navbar-burger"
             aria-label="menu"
             aria-expanded="false"
@@ -24,40 +24,32 @@ const Nav = () => {
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
-          </a>
+          </button>
         </div>
         <div id="navbarMenuHero" className="navbar-menu">
           <div className="navbar-start">
-            <a className="navbar-item is-active">
+            <a href="/" className="navbar-item is-active">
               NFT
             </a>
-            <a className="navbar-item">
+            <a href="/" className="navbar-item">
               Flow
             </a>
-            <a className="navbar-item">
+            <a href="/" className="navbar-item">
               Filecoin/IPFS
             </a>
           </div>
           <div className="navbar-end">
-            <Tippy 
-              className="floating"
-              content="Log in to buy pets"
-              placement="left"
-              theme="light"
-              showOnCreate
-              inertia
-            >
+
               <div className="navbar-item">
                 <AuthCluster />
               </div>
-            </Tippy>
             <span className="navbar-item">
-              <a className="button is-medium is-light">
+              <button className="button is-light">
                 <span className="icon">
-                  <FontAwesomeIcon icon={faGithub} size="lg" />
+                  <FontAwesomeIcon icon={faGithub} size="1x" />
                 </span>
                 <span>Fork</span>
-              </a>
+              </button>
             </span>
           </div>
         </div>
