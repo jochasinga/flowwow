@@ -30,11 +30,12 @@ const TokenData = () => {
     // await mintPetTokens();
     try {
         let res = await mintPetToken({
-            name: "Cat",
+            name: "Catter",
             age: "1",
             breed: "Tabbie",
             color: "black",
             sex: "F",
+            kind: "Cat"
         });
         console.log('res: ', res);
     } catch(err) {

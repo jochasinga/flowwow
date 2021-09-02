@@ -4,6 +4,7 @@ interface  Pet {
     breed: string;
     sex: string;
     color: string;
+    kind: string;
     photo?: string;
     uri?: string;
 }

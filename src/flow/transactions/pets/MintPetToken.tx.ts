@@ -24,7 +24,6 @@ const uploadToStorage = async (pet: Pet) => {
 
 const mintPetTokens = async () => {
     const pets = data.pets;
-    console.log("pets: ", pets);
     pets.forEach(async (pet) => {
         // const uri = await uploadToStorage(pet)
         // pet.uri = uri;
@@ -37,17 +36,9 @@ const mintPetTokens = async () => {
 export const mintPetToken = async (pet: Pet) => {
     const code = await (await fetch(cadenceScript)).text();
     try {
-        // const txId = await fcl.mutate({
-        //     cadence: code,
-        //     args: (arg, t) => [arg(name, t.String)],
-        // });
         const payload = fcl.args([
             fcl.arg(
                 petToCadenceDict(pet),
-                // [
-                //     {key: "name", value: "Neo"},
-                //     {key: "age", value: "3"},
-                // ],
                 t.Dictionary({key: t.String, value: t.String}),
             )
         ])
