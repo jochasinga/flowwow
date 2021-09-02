@@ -1,104 +1,77 @@
 # Flowwow
 
-A scaffold for NFT marketplace built on [Flow](https://onflow.org) and [nft.storage](https://nft.storage)
+A scaffold for NFT marketplace built on [Flow](https://onflow.org) and [nft.storage](https://nft.storage).
+
+The goal here is to have a comprehensive starting point that includes all the important implementations for anyone looking to start an NFT marketplace dapp on Flow and NFT storage.
 
 ## Features
-- **Authentication** in Flow-compatible wallets
-- **Non-fungible Token** contract called `PetShop`
-- **Fungible Token** contract called `WowToken` for buying pets
+- [x] **Authentication** with local dev wallet (local)
+- [ ] **Authentication** with Flow-compatible wallets (testnet)
+- [x] **Non-fungible Token** contract called `PetShop`
+- [ ] **Fungible Token** contract for buying pets
+
 
 ## Getting Started
 
+Here are simple steps to get started:
+
 - Install [Flow CLI](https://docs.onflow.org/flow-cli/install/)
 - Sign up for [NFT.storage](https://nft.storage) account
-- run `flow init` inside the root directory to create `flow.json`
-- run `flow emulator` to start the emulator (local chain)
+- **Optional**: run `flow init` inside the root directory to create `flow.json` if there isn't a `flow.json` in the root directory.
 
-In the `flow.json` file, modify the following sections to look like the following:
+- In the `flow.json` file, modify or check the following sections to look like the following to specify the contract we're deploying:
 
 ```json
 {
     "contracts": {
-		"PetShopContract": "./contracts/PetShopContract.cdc",
-        "WowTokenContract": "./contracts/WowTokenContract.cdc"
-	},
+		"PetShopContract": "./src/flow/contracts/PetShopContract.cdc"
+	}
 }
 ```
 ```json
 {
     "deployments": {
 		"emulator": {
-			"emulator-account": ["PetShopContract", "WowTokenContract"]
+			"emulator-account": ["PetShopContract"]
 		}
 	}
 }
 ```
 
-- Then, run `flow project deploy` to deploy [`PetShopContract`](./contracts/PetShopContract.cdc) and [`WowTokenContract`](./contracts/WowTokenContract.cdc) to the emulator account, taking note of the contract address returned, beginning with `0x`).
+- run `flow emulator` to start the emulator (local chain)
 
+- run `flow project deploy` to deploy the contract(s) specified in the `flow.json`
 
-## Creating Accounts
+- run `npm run mint-tokens` to run a script to mint all NFTs from [`pets.json`](./pets.json) and upload the assets to IPFS.
 
-To create a local account, run `flow key generate` to generate a private key, then add to `flow.json`. The file should look like this:
+## Accounts
 
-```json
-{
-	"emulators": {
-		"default": {
-			"port": 3569,
-			"serviceAccount": "emulator-account"
-		}
-	},
-	"contracts": {
-		"PetShopContract": "./contracts/PetShopContract.cdc"
-	},
-	"networks": {
-		"emulator": "127.0.0.1:3569",
-		"mainnet": "access.mainnet.nodes.onflow.org:9000",
-		"testnet": "access.devnet.nodes.onflow.org:9000"
-	},
-	"accounts": {
-		"emulator-account": {
-			"address": <YOUR-GENERATED-ADDRESS>,
-            "privateKey": <YOUR-PRIVATE-KEY>,
-            "chain": "flow-emulator",
-            "sigAlgorithm": "ECDSA_P256",
-            "hashAlgorithm": "SHA3_256"
-		}
-	},
-	"deployments": {
-		"emulator": {
-			"emulator-account": ["PetShopContract", "WowTokenContract"]
-		}
-	}
-}
-```
-If you need additional accounts (which are useful in testing transferring some WOW tokens to and buy some pets with), run as many as you need, adding to the `accounts` section of `flow.json`:
+Right now only the local mode is supported.
 
-```json
-	"accounts": {
-		"emulator-account": {
-			"address": <YOUR-GENERATED-ADDRESS>,
-            "privateKey": <YOUR-PRIVATE-KEY>,
-            "chain": "flow-emulator",
-            "sigAlgorithm": "ECDSA_P256",
-            "hashAlgorithm": "SHA3_256"
-		},
-        "account-1": {
-            "address": <GENERATED-ADDRESS>,
-            "privateKey": <GENERATED-PRIVATE-KEY>,
-            "chain": "flow-emulator",
-            "sigAlgorithm": "ECDSA_P256",
-            "hashAlgorithm": "SHA3_256"
-        }
-	},
-```
+This requires [fcl-dev-wallet](https://github.com/onflow/fcl-dev-wallet) to be run on port 8701
+
+Click Login or Signup button to
+connect to a local dev wallet, which will let you choose an account. You can choose a separate account from the emulator (master) account to try adopting pets.
 
 ## Interacting with CLI
 
-- Run `flow transactions send ./transactions/MintPet.cdc --signer emulator-account` to mint the first pet token to your own account
-- To check the NFT token's metadata to verify if it is successfully minted, run the [`CheckTokenMetadata`](./scripts/pets/CheckTokenMetadata.cdc) script with `flow scripts execute ./scripts/pets/CheckTokenMetadata.cdc`.
+It can be helpful to directly interact with the contract(s) via the Flow CLI.  Try running the following in a separate terminal, while the emulator is running:
+
+### GetAllTokenIds
+Get all the NFTs' IDs on the chain
+
+`flow scripts execute ./src/flow/scripts/pets/GetAllTokenIds.cdc`
+
+### CheckTokenMetadata
+Get the NFT's metadata from its ID
+
+`flow scripts execute ./src/flow/scripts/pets/CheckTokenMetaData.cdc <id>`
+
+### MintPetToken
+Mint a new NFT of your own. Check out [`pets.json`](./pets.json) to get the idea of the JSON string to pass as an argument. Don't forget to include the IPFS link in the `uri` field (or any link to an online image resource) for your NFT to show up.
+
+`flow transactions send ./src/flow/transactions/pets/MintPetToken.cdc <JSON-string-describing-a-pet>`
 
 ## Copyrights
 
-Dog photos by <a href="https://unsplash.com/@karsten116?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Karsten Winegeart</a> on <a href="https://unsplash.com/s/photos/dog?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+Dog and cat photos from Unsplash.
