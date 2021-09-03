@@ -9,6 +9,8 @@ import Card from "Card";
 import getAllTokenIds from 'flow/scripts/pets/GetAllTokenIds.script';
 import getTokenMetadata from 'flow/scripts/pets/GetTokenMetadata.script';
 import { setSyntheticLeadingComments } from 'typescript';
+import * as fcl from "@onflow/fcl";
+import { flushSync } from 'react-dom';
 
 
 function Hero() {
@@ -34,28 +36,37 @@ function Hero() {
   );
 }
 
-function Tiles({ pets }: any) {
+function Tiles({ pets, user }: any) {
   let myPets1 = pets.slice(0, 4);
   let myPets2 = pets.slice(4);
+  let counter = 1;
   return (
     <section className="section mx-6">
       <div className="block">
         <div className="columns block">
           {
-            myPets1.map((pet: Pet, id: number) => (
-              <div className="column">
-                <Card pet={pet} key={id} />
-              </div>
-            ))
+            myPets1.map((pet: Pet, id: number) => {
+              const el = (
+                <div className="column">
+                  <Card pet={pet} key={counter} id={counter} user={user} />
+                </div>
+              );
+              counter += 1;
+              return el;
+            })
           }
         </div>
         <div className="columns block">
           {
-            myPets2.map((pet: Pet, id: number) => (
-              <div className="column">
-                <Card pet={pet} key={id} />
-              </div>
-            ))
+            myPets2.map((pet: Pet, id: number) => {
+              const el = (
+                <div className="column">
+                  <Card pet={pet} key={counter} id={counter} user={user} />
+                </div>
+              );
+              counter += 1;
+              return el;
+            })
           }
         </div>
       </div>
@@ -67,23 +78,23 @@ function Tiles({ pets }: any) {
 function App() {
   const [pets, setPets] = useState([]);
   const [petIds, setPetIds] = useState([]);
+  const [user, setUser] = useState(null);
   useEffect(() => {
+    fcl.currentUser().subscribe(setUser);
     const getIds = async () => {
       let ids = await getAllTokenIds();
-      console.log("IDs: ", ids);
       setPetIds(ids);
     };
     getIds();
+    console.log("USER: ", user);
   }, []);
 
   useEffect(() => {
-    // let pets: Pet[] = [];
     const getMetadata = async () => {
       let pets = petIds.map(async (id: number) => {
         let data = await getTokenMetadata(id);
         return data;
       });
-      console.log("PETs: ", pets);
       let allPets = await Promise.all(pets);
       setPets(allPets as any);
     };
@@ -107,7 +118,7 @@ function App() {
       <Hero />
       {/* <Nav /> */}
       {/* <TokenData /> */}
-      <Tiles pets={pets} />
+      <Tiles pets={pets} user={user} />
     </div>
   );
 }

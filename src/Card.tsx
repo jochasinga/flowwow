@@ -1,4 +1,6 @@
-const Card = ({ pet }: any) => {
+import transferToken from "flow/transactions/pets/TransferToken.tx";
+
+const Card = ({ pet, user, id }: any) => {
   return (
     <div className="card">
       <header className="card-header">
@@ -43,7 +45,20 @@ const Card = ({ pet }: any) => {
           </tbody>
         </table>
         <footer className="card-footer">
-          <a href="#" className="card-footer-item">Adopt</a>
+          <a 
+            href="#" 
+            className="card-footer-item"
+            onClick={async () => {
+              try {
+                let txId = await transferToken(id, user?.addr);
+                console.log(txId, user?.addr, " adopted ", pet.name);
+              } catch (err) {
+                console.error(err);
+              }
+            }}
+          >
+            Adopt
+          </a>
         </footer>
       </div>
     </div>

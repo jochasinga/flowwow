@@ -45,8 +45,8 @@ pub contract PetShopContract {
             destroy self.ownedNFTs
         }
 
-        pub fun withdraw(withdraw_id: UInt64): @NFT {
-            let token <- self.ownedNFTs.remove(key: withdraw_id)
+        pub fun withdraw(withdrawId: UInt64): @NFT {
+            let token <- self.ownedNFTs.remove(key: withdrawId)
             return <- token!
         }
 
@@ -118,6 +118,8 @@ pub contract PetShopContract {
     //   the contract. Only the creator can mint tokens.
     init() {
         self.account.save(<-self.createEmptyCollection(), to: /storage/NFTCollection)
+        // FIXME: Should not expose this!
+        self.account.link<&Collection>(/public/NFTCollection, target: /storage/NFTCollection)
         self.account.link<&{NFTReceiver}>(/public/NFTReceiver, target: /storage/NFTCollection)
         self.account.save(<-create NFTMinter(), to: /storage/NFTMinter)
     }
