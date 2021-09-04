@@ -118,8 +118,6 @@ pub contract PetShopContract {
     //   the contract. Only the creator can mint tokens.
     init() {
         self.account.save(<-self.createEmptyCollection(), to: /storage/NFTCollection)
-        // FIXME: Should not expose this!
-        self.account.link<&Collection>(/public/NFTCollection, target: /storage/NFTCollection)
         self.account.link<&{NFTReceiver}>(/public/NFTReceiver, target: /storage/NFTCollection)
         self.account.save(<-create NFTMinter(), to: /storage/NFTMinter)
     }
