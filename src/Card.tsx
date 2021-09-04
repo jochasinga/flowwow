@@ -44,22 +44,20 @@ const Card = ({ pet, user, id }: any) => {
             </tr>
           </tbody>
         </table>
-        <footer className="card-footer">
-          <a 
-            href="#" 
-            className="card-footer-item"
-            onClick={async () => {
-              try {
+        { user?.loggedIn &&
+          <footer className="card-footer">
+            <button
+              className="card-footer-item button is-dark subtitle"
+              onClick={async () => {
                 let txId = await transferToken(id, user?.addr);
                 console.log(txId, user?.addr, " adopted ", pet.name);
-              } catch (err) {
-                console.error(err);
-              }
-            }}
-          >
-            Adopt
-          </a>
-        </footer>
+              }}
+            >
+              <span>Adopt</span>&nbsp;
+              <span>&#10084;</span>
+            </button>
+          </footer>
+        }
       </div>
     </div>
   );
