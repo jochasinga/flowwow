@@ -13,7 +13,7 @@ async function transferToken(id: number, recipientAddr: string) {
     try {
         const encoded = await fcl.send([
             fcl.transaction(code),
-            fcl.payer(fcl.authz),
+            fcl.payer(authz),
             fcl.proposer(authz),
             fcl.authorizations([authz]),
             fcl.limit(35),

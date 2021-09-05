@@ -7,11 +7,10 @@ transaction(tokenId: UInt64, recipientAddr: Address) {
     // The field that will hold the NFT as it is being
     // ransferred to the other account
     let transferToken: @PetShopContract.NFT
+    let metadata: {String : String}
 
-    prepare(acct: AuthAccount) {
-        let masterAccount = getAccount(0xf8d6e0586b0a20c7)
-        let collectionRef = masterAccount.getCapability<&PetShopContract.Collection>(from: /storage/NFTCollection)
-            .borrow()
+    prepare(ownerAcct: AuthAccount) {
+        let collectionRef = ownerAcct.borrow<&PetShopContract.Collection>(from: /storage/NFTCollection)
             ?? panic("Could not borrow a reference to the master owner's collection")
 
         // Borrow a reference from the stored collection
@@ -21,6 +20,7 @@ transaction(tokenId: UInt64, recipientAddr: Address) {
         // Call the withdraw function on the sender's Collection
         // to move the NFT out of the collection
         self.transferToken <- collectionRef.withdraw(withdrawId: tokenId)
+        self.metadata = collectionRef.getMetadata(id: tokenId)
     }
 
     execute {
@@ -34,7 +34,7 @@ transaction(tokenId: UInt64, recipientAddr: Address) {
             ?? panic("Could not borrow receiver reference")
 
         // Deposit the NFT in the receivers collection
-        receiverRef.deposit(token: <-self.transferToken)
+        receiverRef.deposit(token: <-self.transferToken, metadata: self.metadata)
 
         log("NFT transferred from sender to recipient account")
     }
