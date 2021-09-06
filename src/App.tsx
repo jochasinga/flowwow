@@ -11,6 +11,7 @@ import getTokenMetadata from 'flow/scripts/pets/GetTokenMetadata.script';
 import { setSyntheticLeadingComments } from 'typescript';
 import * as fcl from "@onflow/fcl";
 import { flushSync } from 'react-dom';
+import getAllExistingTokenIds from 'flow/scripts/pets/GetAllExistingTokenIds.script';
 
 
 function Hero() {
@@ -82,7 +83,8 @@ function App() {
   useEffect(() => {
     fcl.currentUser().subscribe(setUser);
     const getIds = async () => {
-      let ids = await getAllTokenIds();
+    //   let ids = await getAllTokenIds();
+      let ids = await getAllExistingTokenIds();
       setPetIds(ids);
     };
     getIds();

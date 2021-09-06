@@ -114,11 +114,15 @@ const AuthCluster = () => {
                 className={`dropdown-menu ${dropDown ? "" : "is-hidden"}`}
                 id="dropdown-menu"
                 role="menu"
-                onBlur={toggleDropDown}
+                onBlur={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleDropDown();
+                }}
               >
                 <div className="dropdown-content">
                   <a className="dropdown-item" href="#" onClick={async () => {
-                      let txId = await setupReceiverAccount();
+                      let txId = await setupAccount();
                       console.log("TXID: ", txId);
                   }}>
                       Activate Collection
