@@ -3,7 +3,7 @@ import transferToken from "flow/transactions/pets/TransferToken.tx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle, faWallet } from "@fortawesome/free-solid-svg-icons";
 import { useEffect } from "react";
-import getTokenOwner from "flow/scripts/pets/GetTokenOwner.script ";
+import getTokenOwner from "flow/scripts/pets/GetTokenOwner.script";
 import * as fcl from "@onflow/fcl";
 import getAccountTokenIds from "flow/scripts/pets/GetAccountTokenIds.script ";
 import getAllTokenIds from "flow/scripts/pets/GetAllTokenIds.script";
