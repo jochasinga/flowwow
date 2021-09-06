@@ -37,6 +37,8 @@ transaction(tokenId: UInt64, recipientAddr: Address) {
         receiverRef.deposit(token: <-self.transferToken, metadata: self.metadata)
 
         log("NFT transferred from sender to recipient account")
+
+        PetShopContract.ownerMap[tokenId] = recipientAddr
     }
 }
 

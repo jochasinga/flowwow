@@ -1,5 +1,7 @@
 pub contract PetShopContract {
 
+    pub var ownerMap: {UInt64 : Address}
+
     // Resources are items stored in user accounts and
     // accessible through access control measures.
     pub resource NFT {
@@ -98,6 +100,8 @@ pub contract PetShopContract {
         pub fun mint(): @NFT {
             var newNFT <- create NFT(initId: self.idCount)
 
+            PetShopContract.ownerMap[self.idCount] = PetShopContract.account.address
+
             self.idCount = self.idCount + 1 as UInt64
 
             return <-newNFT
@@ -117,6 +121,7 @@ pub contract PetShopContract {
     // - The `NFTMinter` resource is saved in the account storage for the creator of
     //   the contract. Only the creator can mint tokens.
     init() {
+        self.ownerMap = {}
         self.account.save(<-self.createEmptyCollection(), to: /storage/NFTCollection)
         self.account.link<&{NFTReceiver}>(/public/NFTReceiver, target: /storage/NFTCollection)
         self.account.save(<-create NFTMinter(), to: /storage/NFTMinter)
