@@ -1,7 +1,7 @@
 import { useState } from "react";
 import transferToken from "flow/transactions/pets/TransferToken.tx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWallet } from "@fortawesome/free-solid-svg-icons";
+import { faWallet, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useEffect } from "react";
 import getTokenOwner from "flow/scripts/pets/GetTokenOwner.script";
 import * as fcl from "@onflow/fcl";
@@ -101,11 +101,14 @@ const Card = ({ pet, user, id, isActivated }: any) => {
                   ownerAddress !== user.addr &&
                   ownerAddress !== masterAccount
                 }
-                className="card-footer-item button is-dark subtitle"
+                className={
+                  `card-footer-item button subtitle
+                  ${ownerAddress === user.addr ? "is-info" : "is-dark"}`
+                }
                 onClick={async () => {
                   let txId = await transferToken(id, user?.addr);
                   console.log(txId, user?.addr, " adopted ", pet.name);
-                  setOwnerIsCurrentUser(true);
+                  setOwnerAddress(user.addr);
                 }}
               >
                 { ownerAddress !== user.addr && ownerAddress !== masterAccount ?
@@ -116,9 +119,11 @@ const Card = ({ pet, user, id, isActivated }: any) => {
               ) : (
                 <button
                   disabled
-                  className="card-footer-item button is-light subtitle"
+                  className="card-footer-item button is-info subtitle"
                 >
-                  <span>❌</span>&nbsp;Wallet Not Activated
+                  <span className="block">
+                    <FontAwesomeIcon icon={faTimes} size="1x"></FontAwesomeIcon>
+                  </span>&nbsp;Wallet Not Activated
                 </button>
               )
             }
