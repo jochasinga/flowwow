@@ -19,6 +19,8 @@ pub contract PetShopContract {
     // These are methods the NFTReceiver will be able to call.
     pub resource interface NFTReceiver {
 
+        pub fun withdraw(withdrawId: UInt64): @NFT
+
         // deposit an NFT to this NFTReceiver
         pub fun deposit(token: @NFT, metadata: {String : String})
 

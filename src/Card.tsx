@@ -1,13 +1,14 @@
 import { useState } from "react";
 import transferToken from "flow/transactions/pets/TransferToken.tx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWallet, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faWallet, faTimes, faStore } from "@fortawesome/free-solid-svg-icons";
 import { useEffect } from "react";
 import getTokenOwner from "flow/scripts/pets/GetTokenOwner.script";
 import * as fcl from "@onflow/fcl";
 import getAccountTokenIds from "flow/scripts/pets/GetAccountTokenIds.script ";
 import getAllTokenIds from "flow/scripts/pets/GetAllTokenIds.script";
 import Tippy from "@tippyjs/react";
+import transferTokenToContract from "flow/transactions/pets/TransferTokenToContract.tx";
 
 const Card = ({ pet, user, id, isActivated }: any) => {
   let [currentUser, setUser] = useState(user);
@@ -49,8 +50,14 @@ const Card = ({ pet, user, id, isActivated }: any) => {
       <div className="card-content is-flex" style={{flexDirection: "column"}}>
         <div className="block">
           { user?.loggedIn ?
-              <span className={`tag is-rounded is-medium ${ownerAddress === currentUser?.addr && "is-primary"}`}>
-                  <FontAwesomeIcon icon={faWallet} size="1x" />
+              <span className={
+                `tag is-rounded is-medium
+                ${ownerAddress === currentUser?.addr && "is-primary"}`
+              }>
+                  <FontAwesomeIcon 
+                    icon={ownerAddress === masterAccount ? faStore : faWallet}
+                    size="1x" 
+                  />
                   <span>&nbsp;{
                     ownerAddress === currentUser?.addr
                       ? `${ownerAddress} (You)`
@@ -66,7 +73,7 @@ const Card = ({ pet, user, id, isActivated }: any) => {
         <table className="table is-striped is-full-width">
           <thead>
             <tr>
-              <th>Attributes</th>
+              <th>Attributesa</th>
               <th>Values</th>
             </tr>
           </thead>
@@ -105,11 +112,19 @@ const Card = ({ pet, user, id, isActivated }: any) => {
                   `card-footer-item button subtitle
                   ${ownerAddress === user.addr ? "is-info" : "is-dark"}`
                 }
-                onClick={async () => {
-                  let txId = await transferToken(id, user?.addr);
-                  console.log(txId, user?.addr, " adopted ", pet.name);
-                  setOwnerAddress(user.addr);
-                }}
+                onClick={ownerAddress !== user.addr ?
+                  (async () => {
+                    let txId = await transferToken(id, user?.addr);
+                    console.log(txId, user?.addr, " adopted ", pet.name);
+                    setOwnerAddress(user.addr);
+                  }) : (
+                    async () => {
+                      let txId = await transferTokenToContract(id);
+                      console.log(txId, "transferred ", id, " to ", masterAccount);
+                      setOwnerAddress(masterAccount as any);
+                    }
+                  )
+                }
               >
                 { ownerAddress !== user.addr && ownerAddress !== masterAccount ?
                   <span>Not Available</span> :
