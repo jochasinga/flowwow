@@ -30,7 +30,7 @@ const DropdownPanel = ({setAccountReady, setupAccount}: any) => {
   );
 };
 
-const AuthCluster = () => {
+const AuthCluster = ({setActivated}: any) => {
     const [user, setUser]: [any, any] = useState({loggedIn: null});
     const [accountReady, setAccountReady]: [any, any] = useState(false);
     const [dropDown, setDropDown]: [any, any] = useState(false);
@@ -46,6 +46,7 @@ const AuthCluster = () => {
           fcl.currentUser()
       );
       setAccountReady(true);
+      setActivated(true);
     }
 
     useEffect(() => {

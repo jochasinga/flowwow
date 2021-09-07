@@ -1,18 +1,20 @@
 import { useState } from "react";
 import transferToken from "flow/transactions/pets/TransferToken.tx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserCircle, faWallet } from "@fortawesome/free-solid-svg-icons";
+import { faWallet } from "@fortawesome/free-solid-svg-icons";
 import { useEffect } from "react";
 import getTokenOwner from "flow/scripts/pets/GetTokenOwner.script";
 import * as fcl from "@onflow/fcl";
 import getAccountTokenIds from "flow/scripts/pets/GetAccountTokenIds.script ";
 import getAllTokenIds from "flow/scripts/pets/GetAllTokenIds.script";
+import Tippy from "@tippyjs/react";
 
-const Card = ({ pet, user, id }: any) => {
+const Card = ({ pet, user, id, isActivated }: any) => {
   let [currentUser, setUser] = useState(user);
   let [ownerAddress, setOwnerAddress] = useState(null);
   let [ownerIsCurrentUser, setOwnerIsCurrentUser] = useState(false);
   let [ownerIsContract, setOwnerIsContract] = useState(true);
+
   const masterAccount = process.env.REACT_APP_EMULATOR_ACCOUNT;
   useEffect(() => {
     const getNFTOwner = async (id: number) => {
@@ -93,23 +95,33 @@ const Card = ({ pet, user, id }: any) => {
         </table>
         { user?.loggedIn &&
           <footer className="card-footer">
-            <button
-              disabled={
-                ownerAddress !== user.addr &&
-                ownerAddress !== masterAccount
-              }
-              className="card-footer-item button is-dark subtitle"
-              onClick={async () => {
-                let txId = await transferToken(id, user?.addr);
-                console.log(txId, user?.addr, " adopted ", pet.name);
-                setOwnerIsCurrentUser(true);
-              }}
-            >
-              { ownerAddress !== user.addr && ownerAddress !== masterAccount ?
-                <span>Not Available</span> :
-                <span>{ownerAddress === currentUser?.addr ? "Donate 👋" : "Adopt ❤️"}</span>
-              }
-            </button>
+            { isActivated ? (
+              <button
+                disabled={
+                  ownerAddress !== user.addr &&
+                  ownerAddress !== masterAccount
+                }
+                className="card-footer-item button is-dark subtitle"
+                onClick={async () => {
+                  let txId = await transferToken(id, user?.addr);
+                  console.log(txId, user?.addr, " adopted ", pet.name);
+                  setOwnerIsCurrentUser(true);
+                }}
+              >
+                { ownerAddress !== user.addr && ownerAddress !== masterAccount ?
+                  <span>Not Available</span> :
+                  <span>{ownerAddress === currentUser?.addr ? "Donate 👋" : "Adopt ❤️"}</span>
+                }
+              </button>
+              ) : (
+                <button
+                  disabled
+                  className="card-footer-item button is-light subtitle"
+                >
+                  <span>❌</span>&nbsp;Wallet Not Activated
+                </button>
+              )
+            }
           </footer>
         }
       </div>

@@ -2,7 +2,7 @@ import AuthCluster from './AuthCluster';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 
-const Nav = () => {
+const Nav = ({setActivated}: any) => {
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
       <div className="container">
@@ -41,7 +41,7 @@ const Nav = () => {
           <div className="navbar-end">
 
               <div className="navbar-item">
-                <AuthCluster />
+                <AuthCluster setActivated={setActivated} />
               </div>
             <span className="navbar-item">
               <button className="button is-light">
