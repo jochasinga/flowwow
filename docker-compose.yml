@@ -1,0 +1,24 @@
+version: "3"
+services:
+  wallet:
+    build: Dockerfile.wallet
+    ports:
+      - "8701:8701"
+    environment:
+      - PORT=8701
+      - FLOW_ACCESS_NODE=http://emulator:8080
+      - FLOW_ACCOUNT_KEY_ID=0
+      - FLOW_ACCOUNT_PRIVATE_KEY=bd7a891abd496c9cf933214d2eab26b2a41d614d81fc62763d2c3f65d33326b0
+      - FLOW_ACCOUNT_PUBLIC_KEY=5f5f1442afcf0c817a3b4e1ecd10c73d151aae6b6af74c0e03385fb840079c2655f4a9e200894fd40d51a27c2507a8f05695f3fba240319a8a2add1c598b5635
+      - FLOW_INIT_ACCOUNTS=0
+      - FLOW_ACCOUNT_ADDRESS=0xf8d6e0586b0a20c7
+      - FLOW_AVATAR_URL=https://avatars.onflow.org/avatar/
+  emulator:
+    image: gcr.io/flow-container-registry/emulator:0.20.2
+    ports:
+      - "8080:8080"
+      - "3569:3569"
+    environment:
+      - FLOW_SERVICEPRIVATEKEY=bd7a891abd496c9cf933214d2eab26b2a41d614d81fc62763d2c3f65d33326b0
+      - FLOW_SERVICEKEYSIGALGO=ECDSA_P256
+      - FLOW_SERVICEKEYHASHALGO=SHA3_256

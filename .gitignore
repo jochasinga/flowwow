@@ -1,6 +1,9 @@
 flow.json
 node_modules
-.env.*
+
+.env.emulator
+.env.development
+.env.production
 
 target/
 

@@ -36,12 +36,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "emulator": "flow emulator",
     "deploy-contracts": "flow project deploy",
     "mint-tokens": "cd minter && ./target/debug/minter",
-    "dev": "npm run emulator & npm run deploy-contracts & npm run mint-tokens",
-    "dev-wallet": "docker run ghcr.io/onflow/fcl-dev-wallet:latest",
-    "gen-account": "flow keys generate"
+    "dev": "docker-compose up && npm run start & flow project deploy & npm run mint-tokens"
   },
   "eslintConfig": {
     "extends": [
