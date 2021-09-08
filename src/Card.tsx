@@ -48,33 +48,58 @@ const Card = ({ pet, user, id, isActivated }: any) => {
         </figure>
       </div>
       <div className="card-content is-flex" style={{flexDirection: "column"}}>
-        <div className="block">
-          { user?.loggedIn ?
-              <span className={
-                `tag is-rounded is-medium
-                ${ownerAddress === currentUser?.addr && "is-primary"}`
-              }>
-                  <FontAwesomeIcon 
-                    icon={ownerAddress === masterAccount ? faStore : faWallet}
-                    size="1x" 
-                  />
-                  <span>&nbsp;{
-                    ownerAddress === currentUser?.addr
-                      ? `${ownerAddress} (You)`
-                      : ownerAddress
-                  }</span>
-              </span>
-            : <span className={`tag is-rounded is-medium`}>
-                <FontAwesomeIcon icon={faWallet} size="1x" />
-                <span>&nbsp;{ownerAddress}</span>
-              </span>
-          }
+        <div className="level">
+          <div className="tags has-addons level-item has-text-centered">
+            { user?.loggedIn ? (
+                <>
+                  <span className={
+                    `tag is-rounded is-medium
+                    ${ownerAddress === currentUser?.addr && "is-primary is-light"}`
+                  }>
+                    <FontAwesomeIcon
+                      icon={ownerAddress === masterAccount ? faStore : faWallet}
+                      size="1x"
+                    />
+                    <span className="ml-2 has-text-weight-bold">Owner</span>
+                  </span>
+
+                  <Tippy
+                    className="floating"
+                    content={ ownerAddress === currentUser?.addr
+                        ? "This is your account"
+                        : ownerAddress === masterAccount
+                            ? "This is the marketplace's account"
+                            : "This is another user's account"
+                    }
+                    placement="top"
+                    theme="light"
+                    inertia
+                  >
+                    <span className={
+                      `tag is-rounded is-medium has-text-weight-medium
+                      ${ownerAddress === currentUser?.addr ? "is-primary" : "is-info"}`
+                    }>{ownerAddress}</span>
+                  </Tippy>
+                </>
+              ) : (
+                <>
+                  <span className="tag is-rounded is-medium">
+                    <FontAwesomeIcon icon={ownerAddress === masterAccount ? faStore : faWallet} size="1x" />
+                    <span className="ml-2 has-text-weight-bold">Owner</span>
+                  </span>
+                  <span className="tag is-rounded is-info is-medium has-text-weight-medium">
+                    {ownerAddress}
+                  </span>
+                </>
+              )
+            }
+          </div>
         </div>
         <table className="table is-striped is-full-width">
           <thead>
             <tr>
-              <th>Attributesa</th>
-              <th>Values</th>
+              <th>Fields</th>
+              <th>Characteristics</th>
             </tr>
           </thead>
           <tbody>
@@ -100,6 +125,7 @@ const Card = ({ pet, user, id, isActivated }: any) => {
             </tr>
           </tbody>
         </table>
+
         { user?.loggedIn &&
           <footer className="card-footer">
             { isActivated ? (
