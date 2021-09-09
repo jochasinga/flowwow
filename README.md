@@ -10,7 +10,10 @@ First, make sure you have installe [Flow CLI](https://docs.onflow.org/flow-cli/i
 
 2. Deploy the [`PetshopContract`](./src/flow/contracts/PetshopContract.cdc) with `flow project deploy`
 
-3. Mint the NFTs with `npm run mint-tokens`, which run the program in [`/minter`](./minter) that serializes [`pets.json`](./pets.json) and send transactions over to the local emulator and uploading images to NFT storage.
+3. Mint the NFTs
+    3.1 Add NFT storage API key in the `.env.local` file with `REACT_APP_NFTSTORAGE_API_KEY={your API token}`
+    3.2 Mint the NFTs with `npm run mint-tokens`, which run the program in [`/minter`](./minter) that serializes [`pets.json`](./pets.json) and send transactions over to the local emulator and uploading images to NFT storage.
+    3.3 Alternatively, if you're adding the key to a different `.env.*` file, make sure to provide the path to the file with `ENVFILE={.env.*} npm run mint-tokens`.
 
 ### Features
 - [x] **Authentication** with local dev wallet

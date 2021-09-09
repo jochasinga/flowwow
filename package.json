@@ -37,7 +37,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy-contracts": "flow project deploy",
-    "mint-tokens": "cd minter && ./target/debug/minter",
+    "mint-tokens": "cd minter && ./target/debug/minter $ENVFILE",
     "dev": "docker-compose up && npm run start & flow project deploy & npm run mint-tokens"
   },
   "eslintConfig": {

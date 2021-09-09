@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use reqwest;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use dotenv;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -36,16 +36,24 @@ struct NFTResponse {
 }
 
 const UPLOAD_URL: &str = "https://api.nft.storage/upload";
+const DEFAULT_ENV_FILE: &str = "../.env.local";
 
 fn main() -> Result<()> {
-    dotenv::from_filename("../.env.local").ok();
+    let custom_env_file: Option<String> = env::args().collect::<Vec<String>>().pop();
+    let mut env_file = DEFAULT_ENV_FILE.to_string();
+    
+    if let Some(file_path) = custom_env_file {
+        env_file = file_path;
+    }
+
+    dotenv::from_filename(env_file).ok();
     let client = reqwest::blocking::Client::new();
     let mut token: Option<String> = None;
 
     if let Ok(tok) = env::var("REACT_APP_NFTSTORAGE_API_KEY") {
         token.replace(tok);            
     } else {
-        return Ok(())
+        return Err(anyhow!("Missing REACT_APP_NFTSTORAGE_API_KEY in .env.local"))
     }
     
     let contents = fs::read_to_string("../pets.json")
