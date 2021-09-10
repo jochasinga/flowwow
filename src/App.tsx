@@ -7,6 +7,8 @@ import getTokenMetadata from 'flow/scripts/pets/GetTokenMetadata.script';
 import * as fcl from "@onflow/fcl";
 import getAllExistingTokenIds from 'flow/scripts/pets/GetAllExistingTokenIds.script';
 import getAccountTokenIds from 'flow/scripts/pets/GetAccountTokenIds.script ';
+import data from "pets.json";
+import Pet from "pet";
 
 function App() {
   const [pets, setPets] = useState([]);
@@ -25,10 +27,21 @@ function App() {
         }
       }
     });
+
     const getIds = async () => {
       let ids = await getAllExistingTokenIds();
+      if (ids.length == 0) {
+          await getPets();
+          return;
+      }
       setPetIds(ids);
     };
+
+    const getPets = async () => {
+        let pets = data.pets;
+        setPets(pets as any);
+    }
+
     getIds();
   }, []);
 

@@ -1,0 +1,21 @@
+.modal-background {
+    background: rgb(94,34,195);
+    background: linear-gradient(90deg, rgba(94,34,195,0.9) 0%, rgba(253,187,45, 0.9) 100%);
+}
+
+.loading {
+    overflow: hidden;
+
+    .runner {
+        height: auto;
+        width: 50%;
+    }
+
+    .title {
+        margin-top: -80px;
+        color: white;
+    }
+}
+
+
+

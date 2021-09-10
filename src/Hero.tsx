@@ -1,4 +1,5 @@
 import Nav from "Nav";
+import "./Hero.scss";
 
 function Hero({ setActivated }: HeroProps) {
   return (

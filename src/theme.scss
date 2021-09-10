@@ -1,9 +1,11 @@
 // Import a Google Font
 @import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
 
-$purple: #8A4D76;
+// $purple: #8A4D76;
+$purple: rgb(94,34,195);
 $pink: #FA7C91;
 $brown: #757763;
+$yellow: rgb(253,187,45);
 $beige-light: #D0D1CD;
 $beige-lighter: #EFF0EB;
 
@@ -15,6 +17,7 @@ $primary: $purple;
 $secondary: $beige-light;
 $info: $brown;
 $link: $pink;
+$warning: $yellow;
 
 // Update some of Bulma's component variables
 $control-border-width: 2px;

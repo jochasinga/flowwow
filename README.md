@@ -10,20 +10,31 @@ First, make sure you have installe [Flow CLI](https://docs.onflow.org/flow-cli/i
 
 2. Deploy the [`PetshopContract`](./src/flow/contracts/PetshopContract.cdc) with `flow project deploy`
 
-3. Mint the NFTs
-    3.1 Add NFT storage API key in the `.env.local` file with `REACT_APP_NFTSTORAGE_API_KEY={your API token}`
-    3.2 Mint the NFTs with `npm run mint-tokens`, which run the program in [`/minter`](./minter) that serializes [`pets.json`](./pets.json) and send transactions over to the local emulator and uploading images to NFT storage.
-    3.3 Alternatively, if you're adding the key to a different `.env.*` file, make sure to provide the path to the file with `ENVFILE={.env.*} npm run mint-tokens`.
+3. Optional: Pre-mint the NFTs
+    - Add NFT storage API key in the `.env.local` file with `REACT_APP_NFTSTORAGE_API_KEY={your API token}`
+    - Mint the NFTs with `npm run mint-tokens`, which run the program in [`/minter`](./minter) that serializes [`pets.json`](./pets.json) and send transactions over to the local emulator and uploading images to NFT storage.
+    - Alternatively, if you're adding the key to a different `.env.*` file, make sure to provide the path to the file with `ENVFILE={.env.*} npm run mint-tokens`.
+
+4. Click Login or Signup button to connect to a local dev wallet, which will let you choose an account. You can choose a separate account from the emulator (service account) or create new ones. Then, select "Activate Collection" under the dropdown menu for every new account.
+
+5. Try minting, adopting (transfer from marketplace to you), and releasing (transferring back to the marketplace) pet NFTs.
+
+> 💡 Pre-minting all pets with the command line will mint and deposit them to the emulator's (service account's) address, ready to be transferred to another logged in account.
+>
+> Without the pre-minting, the logged in user will be able to mint each pet individually.
 
 ### Features
-- [x] **Authentication** with local dev wallet
-- [ ] **Authentication** with Flow-compatible wallets (testnet)
-- [x] **Non-fungible Token** contract called `PetShopContract`
-- [ ] **Fungible Token** for buying pet NFTs
-
-
-Click Login or Signup button to
-connect to a local dev wallet, which will let you choose an account. You can choose a separate account from the emulator (master) account to try adopting pets.
+- [ ] **Authentication**
+    - [x] Local dev wallet (emulator)
+    - [ ] Flow-compatible wallets (testnet)
+- [x] **Non-fungible Token**
+    - [x] Account setup
+    - [x] Minting (pre-minting and user-minting)
+    - [x] Withdrawing and deposit
+- [ ] **Fungible Token**
+    - [ ] Account setup
+    - [ ] Minting
+    - [ ] Withdrawing and deposit
 
 ### Interacting with CLI
 

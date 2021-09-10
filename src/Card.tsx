@@ -1,25 +1,43 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import transferToken from "flow/transactions/pets/TransferToken.tx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWallet, faTimes, faStore } from "@fortawesome/free-solid-svg-icons";
+import { faWallet, faTimes, faStore, faBoxOpen } from "@fortawesome/free-solid-svg-icons";
 import { useEffect } from "react";
 import getTokenOwner from "flow/scripts/pets/GetTokenOwner.script";
 import * as fcl from "@onflow/fcl";
 import getAccountTokenIds from "flow/scripts/pets/GetAccountTokenIds.script ";
-import getAllTokenIds from "flow/scripts/pets/GetAllTokenIds.script";
 import Tippy from "@tippyjs/react";
 import transferTokenToContract from "flow/transactions/pets/TransferTokenToContract.tx";
+import Pet from "pet";
+import mintPetToken from "flow/transactions/pets/MintPetToken.tx";
+import Loader from "Loader/Loader";
+import "./Card.scss";
 
-const Card = ({ pet, user, id, isActivated }: any) => {
+interface CardProps {
+  pet: Pet,
+  user: any,
+  id: number,
+  isActivated: boolean,
+  isMinted?: boolean,
+}
+
+const Card = ({ pet, user, id, isActivated }: CardProps) => {
   let [currentUser, setUser] = useState(user);
   let [ownerAddress, setOwnerAddress] = useState(null);
   let [ownerIsCurrentUser, setOwnerIsCurrentUser] = useState(false);
   let [ownerIsContract, setOwnerIsContract] = useState(true);
+  let [isMinted, setMinted] = useState(false);
+  let [isMinting, setMinting] = useState(false);
 
-  const masterAccount = process.env.REACT_APP_EMULATOR_ACCOUNT;
-  useEffect(() => {
-    const getNFTOwner = async (id: number) => {
-      let addr = await getTokenOwner(id);
+  const getNFTOwner = async (id: number) => {
+    console.log("getNFTOwner");
+    let addr: string | any = await getTokenOwner(id);
+    console.log(addr, " owns NFT ", id);
+    if (addr?.error) {
+      setMinted(false);
+      setOwnerAddress("Not Minted" as any);
+    } else {
+      setMinted(true);
       setOwnerAddress(addr);
       const tokenIds = await getAccountTokenIds(addr);
       if (currentUser?.addr === ownerAddress) {
@@ -30,13 +48,22 @@ const Card = ({ pet, user, id, isActivated }: any) => {
         setOwnerIsCurrentUser(false);
       }
     }
-    getNFTOwner(id);
+  };
+
+  const masterAccount = process.env.REACT_APP_EMULATOR_ACCOUNT;
+  useEffect(() => {
+    getNFTOwner(id)
 
     fcl.currentUser().subscribe(setUser);
   }, []);
 
+  // useEffect(() => {
+
+  // }, [ownerAddress]);
+
   return (
     <div className="card">
+      <Loader isActive={isMinting} message="✨ Minting... ✨" />
       <header className="card-header">
         <p className="card-header-title subtitle is-centered">
           {pet.name}
@@ -44,54 +71,82 @@ const Card = ({ pet, user, id, isActivated }: any) => {
       </header>
       <div className="card-image">
         <figure className="image is-4by4">
-          <img src={pet.uri} alt="Pet image" />
+          <img src={pet.uri || pet.photo} alt="Pet image" />
         </figure>
       </div>
-      <div className="card-content is-flex" style={{flexDirection: "column"}}>
+      <div className="card-content is-flex" style={{ flexDirection: "column" }}>
         <div className="level">
           <div className="tags has-addons level-item has-text-centered">
-            { user?.loggedIn ? (
-                <>
-                  <span className={
-                    `tag is-rounded is-medium
+            {user?.loggedIn ? (
+              <>
+                <span className={
+                  `tag is-rounded is-medium
                     ${ownerAddress === currentUser?.addr && "is-primary is-light"}`
-                  }>
-                    <FontAwesomeIcon
-                      icon={ownerAddress === masterAccount ? faStore : faWallet}
-                      size="1x"
-                    />
-                    <span className="ml-2 has-text-weight-bold">Owner</span>
-                  </span>
-
-                  <Tippy
-                    className="floating"
-                    content={ ownerAddress === currentUser?.addr
-                        ? "This is your account"
-                        : ownerAddress === masterAccount
-                            ? "This is the marketplace's account"
-                            : "This is another user's account"
+                }>
+                  <FontAwesomeIcon
+                    icon={ ownerAddress === masterAccount 
+                      ? faStore
+                      : ownerAddress === "Not Minted"
+                        ? faBoxOpen
+                        : faWallet
                     }
-                    placement="top"
-                    theme="light"
-                    inertia
-                  >
-                    <span className={
-                      `tag is-rounded is-medium has-text-weight-medium
+                    size="1x"
+                  />
+                  <span className="ml-2 has-text-weight-bold">Owner</span>
+                </span>
+
+                <Tippy
+                  className="floating"
+                  content={ownerAddress === currentUser?.addr
+                    ? "This is your account"
+                    : ownerAddress === masterAccount
+                      ? "This is the marketplace's account"
+                      : ownerAddress === "Not Minted"
+                        ? "Be the first to mint"
+                        : "This is another user's account"
+                  }
+                  placement="top"
+                  theme="light"
+                  inertia
+                >
+                  <span className={
+                    `tag is-rounded is-medium has-text-weight-medium
                       ${ownerAddress === currentUser?.addr ? "is-primary" : "is-info"}`
-                    }>{ownerAddress}</span>
-                  </Tippy>
-                </>
-              ) : (
-                <>
-                  <span className="tag is-rounded is-medium">
-                    <FontAwesomeIcon icon={ownerAddress === masterAccount ? faStore : faWallet} size="1x" />
-                    <span className="ml-2 has-text-weight-bold">Owner</span>
-                  </span>
+                  }>{ownerAddress}</span>
+                </Tippy>
+              </>
+            ) : (
+              <>
+                <span className="tag is-rounded is-medium">
+                  <FontAwesomeIcon icon={
+                    ownerAddress === masterAccount 
+                      ? faStore 
+                      : ownerAddress == "Not Minted"
+                        ? faBoxOpen
+                        : faWallet
+                    } size="1x" />
+                  <span className="ml-2 has-text-weight-bold">Owner</span>
+                </span>
+                <Tippy
+                  className="floating"
+                  content={ownerAddress === currentUser?.addr
+                    ? "This is your account"
+                    : ownerAddress === masterAccount
+                      ? "This is the marketplace's account"
+                      : ownerAddress === "Not Minted"
+                        ? "Be the first to mint"
+                        : "This is another user's account"
+                  }
+                  placement="top"
+                  theme="light"
+                  inertia
+                >
                   <span className="tag is-rounded is-info is-medium has-text-weight-medium">
                     {ownerAddress}
                   </span>
-                </>
-              )
+                </Tippy>
+              </>
+            )
             }
           </div>
         </div>
@@ -126,23 +181,33 @@ const Card = ({ pet, user, id, isActivated }: any) => {
           </tbody>
         </table>
 
-        { user?.loggedIn &&
-          <footer className="card-footer">
-            { isActivated ? (
+        {user?.loggedIn &&
+          <footer className="card-footer cta-container">
+            {isActivated ? (
               <button
                 disabled={
-                  ownerAddress !== user.addr &&
-                  ownerAddress !== masterAccount
+                  ownerAddress !== user.addr
+                  && ownerAddress !== masterAccount
+                  && ownerAddress !== "Not Minted"
                 }
                 className={
                   `card-footer-item button subtitle
-                  ${ownerAddress === user.addr ? "is-info" : "is-dark"}`
+                  ${ownerAddress === user.addr ? "is-info" : "is-dark"}
+                  ${ownerAddress === "Not Minted" && "mint-button"}`
                 }
                 onClick={ownerAddress !== user.addr ?
                   (async () => {
-                    let txId = await transferToken(id, user?.addr);
-                    console.log(txId, user?.addr, " adopted ", pet.name);
-                    setOwnerAddress(user.addr);
+                    if (isMinted) {
+                      let txId = await transferToken(id, user?.addr);
+                      console.log(txId, user?.addr, " adopted ", pet.name);
+                      setOwnerAddress(user.addr);
+                    } else {
+                      setMinting(true);
+                      const data = await mintPetToken(pet);
+                      setOwnerIsContract(true);
+                      setOwnerAddress(masterAccount as any);
+                      setMinting(false);
+                    }
                   }) : (
                     async () => {
                       let txId = await transferTokenToContract(id);
@@ -152,21 +217,29 @@ const Card = ({ pet, user, id, isActivated }: any) => {
                   )
                 }
               >
-                { ownerAddress !== user.addr && ownerAddress !== masterAccount ?
-                  <span>Not Available</span> :
-                  <span>{ownerAddress === currentUser?.addr ? "Donate 👋" : "Adopt ❤️"}</span>
+                {ownerAddress !== user.addr
+                  && ownerAddress !== masterAccount
+                  && ownerAddress !== "Not Minted"
+                  ? <span>Not Available</span>
+                  : <span>{
+                    ownerAddress === currentUser?.addr
+                      ? "Release 👋"
+                      : ownerAddress === "Not Minted"
+                        ? "Mint ✨"
+                        : "Adopt ❤️"
+                  }</span>
                 }
               </button>
-              ) : (
-                <button
-                  disabled
-                  className="card-footer-item button is-info subtitle"
-                >
-                  <span className="block">
-                    <FontAwesomeIcon icon={faTimes} size="1x"></FontAwesomeIcon>
-                  </span>&nbsp;Wallet Not Activated
-                </button>
-              )
+            ) : (
+              <button
+                disabled
+                className="card-footer-item button is-info subtitle"
+              >
+                <span className="block">
+                  <FontAwesomeIcon icon={faTimes} size="1x"></FontAwesomeIcon>
+                </span>&nbsp;Wallet Not Activated
+              </button>
+            )
             }
           </footer>
         }

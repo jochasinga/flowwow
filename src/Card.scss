@@ -1,0 +1,19 @@
+.mint-button {
+    background: rgb(94,34,195);
+    background: linear-gradient(
+        120deg,
+        #8A4D76 0%,
+        rgba(94,34,195,1) 45%,
+        rgba(253,187,45,1) 100%
+    );
+
+    :hover > & {
+        background: rgb(0,0,0);
+        background: linear-gradient(
+            120deg,
+            #8A4D76 0%,
+            rgba(94,34,195,.8) 45%,
+            rgba(253,187,45,.8) 100%
+        );
+    }
+}

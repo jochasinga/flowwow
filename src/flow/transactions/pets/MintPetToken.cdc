@@ -30,9 +30,13 @@ transaction(metadata: {String : String}) {
             "uri": "ipfs://bafkreib6sjwicehehpyeolffk7utttowgts4ic24gnxgx3pxpjbwixpyka"
         }
         */
-        log(metadata)
 
+        // Mint the token by calling `mint()` on `@NFTMinter` resource, which returns
+        // an `@NFT` resource, and move it to a variable `newNFT`.
         let newNFT <- self.minterRef.mint()
+
+        // Call `deposit(..)` on the `@NFTReceiver` resource to deposit the token.
+        // Note that this is where the metadata can be changed before transferring.
         self.receiverRef.deposit(token: <-newNFT, metadata: metadata)
         log("NFT Minted and deposited to Account 2's Collection")
     }

@@ -11,7 +11,7 @@ const Nav = ({setActivated}: any) => {
             <h1 className="title">🐶 Flowwow</h1>
           </a>
           <div className="navbar-item">
-            <span className="tag is-light">
+            <span className="tag is-primary is-rounded is-medium">
               { process.env.REACT_APP_FLOW_NET }
             </span>
           </div>
@@ -28,14 +28,14 @@ const Nav = ({setActivated}: any) => {
         </div>
         <div id="navbarMenuHero" className="navbar-menu">
           <div className="navbar-start">
-            <a href="/" className="navbar-item is-active">
-              NFT
+            <a href="https://ethereum.org/en/nft/" className="navbar-item">
+              What is NFT
             </a>
-            <a href="/" className="navbar-item">
+            <a href="https://onflow.org" className="navbar-item">
               Flow
             </a>
-            <a href="/" className="navbar-item">
-              Filecoin/IPFS
+            <a href="https://nft.storage/" className="navbar-item">
+              NFT Storage
             </a>
           </div>
           <div className="navbar-end">
