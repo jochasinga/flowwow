@@ -4,7 +4,7 @@ import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "tippy.js/themes/light.css";
 import setupReceiverAccount from "flow/transactions/pets/SetupReceiverAccount.tx";
-import getAccountTokenIds from "flow/scripts/pets/GetAccountTokenIds.script ";
+import getAccountTokenIds from "flow/scripts/pets/GetAccountTokenIds.script";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleUp } from "@fortawesome/free-solid-svg-icons";
 

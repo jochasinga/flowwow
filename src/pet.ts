@@ -1,4 +1,5 @@
 interface  Pet {
+    id?: number;
     name:  string;
     age: string;
     breed: string;
@@ -10,9 +11,11 @@ interface  Pet {
 }
 
 export const petToCadenceDict = (pet: any) => (
-    Object.keys(pet).map((k, i) => (
-        {key: k, value: pet[k]}
-    ))
+    Object.keys(pet).map((k, i) => {
+        if (k !== "id") {
+            return {key: k, value: pet[k]};
+        }
+    })
 );
 
 export default Pet;

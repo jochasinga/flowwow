@@ -5,13 +5,16 @@ import { faWallet, faTimes, faStore, faBoxOpen } from "@fortawesome/free-solid-s
 import { useEffect } from "react";
 import getTokenOwner from "flow/scripts/pets/GetTokenOwner.script";
 import * as fcl from "@onflow/fcl";
-import getAccountTokenIds from "flow/scripts/pets/GetAccountTokenIds.script ";
+import getAccountTokenIds from "flow/scripts/pets/GetAccountTokenIds.script";
 import Tippy from "@tippyjs/react";
 import transferTokenToContract from "flow/transactions/pets/TransferTokenToContract.tx";
 import Pet from "pet";
 import mintPetToken from "flow/transactions/pets/MintPetToken.tx";
 import Loader from "Loader/Loader";
 import "./Card.scss";
+import {toTitleCase, objectsEqual} from "helpers";
+import getTokenMetadata from "flow/scripts/pets/GetTokenMetadata.script";
+import getAllTokenIds from "flow/scripts/pets/GetAllTokenIds.script";
 
 interface CardProps {
   pet: Pet,
@@ -28,6 +31,7 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
   let [ownerIsContract, setOwnerIsContract] = useState(true);
   let [isMinted, setMinted] = useState(false);
   let [isMinting, setMinting] = useState(false);
+  let [tokenId, setTokenId] = useState(0);
 
   const getNFTOwner = async (id: number) => {
     console.log("getNFTOwner");
@@ -61,6 +65,15 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
 
   // }, [ownerAddress]);
 
+  const isMatchingTokenId = async (id: number, metadata: Pet) => {
+    let data = await getTokenMetadata(id);
+    console.log("pet data: ", data);
+    console.log("pet meta: ", metadata);
+    const matched = objectsEqual(data as Pet, metadata);
+    console.log("matched?: ", matched);
+    return matched;
+  }
+
   return (
     <div className="card">
       <Loader isActive={isMinting} message="✨ Minting... ✨" />
@@ -84,7 +97,7 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
                     ${ownerAddress === currentUser?.addr && "is-primary is-light"}`
                 }>
                   <FontAwesomeIcon
-                    icon={ ownerAddress === masterAccount 
+                    icon={ownerAddress === masterAccount
                       ? faStore
                       : ownerAddress === "Not Minted"
                         ? faBoxOpen
@@ -119,12 +132,12 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
               <>
                 <span className="tag is-rounded is-medium">
                   <FontAwesomeIcon icon={
-                    ownerAddress === masterAccount 
-                      ? faStore 
+                    ownerAddress === masterAccount
+                      ? faStore
                       : ownerAddress == "Not Minted"
                         ? faBoxOpen
                         : faWallet
-                    } size="1x" />
+                  } size="1x" />
                   <span className="ml-2 has-text-weight-bold">Owner</span>
                 </span>
                 <Tippy
@@ -158,26 +171,16 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Kind</td>
-              <td>{pet.kind}</td>
-            </tr>
-            <tr>
-              <td>Age</td>
-              <td>{pet.age}</td>
-            </tr>
-            <tr>
-              <td>Sex</td>
-              <td>{pet.sex}</td>
-            </tr>
-            <tr>
-              <td>Color</td>
-              <td>{pet.color}</td>
-            </tr>
-            <tr>
-              <td>Breed</td>
-              <td>{pet.breed}</td>
-            </tr>
+            { Object.keys(pet).map((k, i) => {
+              if (!["photo", "uri"].includes(k)) {
+                return (
+                  <tr key={i}>
+                    <td>{toTitleCase(k)}</td>
+                    <td>{toTitleCase((pet as any)[k])}</td>
+                  </tr>
+                );
+              }
+            })}
           </tbody>
         </table>
 
@@ -197,21 +200,31 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
                 }
                 onClick={ownerAddress !== user.addr ?
                   (async () => {
-                    if (isMinted) {
-                      let txId = await transferToken(id, user?.addr);
+                    if (isMinted && tokenId !== null) {
+                      let txId = await transferToken(tokenId, user?.addr);
                       console.log(txId, user?.addr, " adopted ", pet.name);
                       setOwnerAddress(user.addr);
                     } else {
                       setMinting(true);
                       const data = await mintPetToken(pet);
+                      let masterTokenIds = await getAllTokenIds();
+
+                      masterTokenIds.forEach(async (id: number) => {
+                        let matched = await isMatchingTokenId(id, pet);
+                        if (matched) {
+                          setTokenId(id);
+                        }
+                      });
+
                       setOwnerIsContract(true);
                       setOwnerAddress(masterAccount as any);
                       setMinting(false);
+                      setMinted(true);
                     }
                   }) : (
                     async () => {
-                      let txId = await transferTokenToContract(id);
-                      console.log(txId, "transferred ", id, " to ", masterAccount);
+                      let txId = await transferTokenToContract(tokenId);
+                      console.log(txId, "transferred ", tokenId, " to ", masterAccount);
                       setOwnerAddress(masterAccount as any);
                     }
                   )

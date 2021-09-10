@@ -6,6 +6,7 @@ function Tiles({ pets, user, isActivated }: TilesProps) {
   // FIXME: This is a quick hack
   let myPets1 = pets.slice(0, 4);
   let myPets2 = pets.slice(4);
+
   let counter = 1;
 
   return (
@@ -15,7 +16,7 @@ function Tiles({ pets, user, isActivated }: TilesProps) {
           {
             myPets1.map((pet: Pet) => {
               const el = (
-                <div className="column">
+                <div className="column is-mobile">
                   <Card
                     pet={pet}
                     key={counter}
@@ -32,7 +33,7 @@ function Tiles({ pets, user, isActivated }: TilesProps) {
         </div>
         <div className="columns block">
           {
-            myPets2.map((pet: Pet, id: number) => {
+            myPets2.map((pet: Pet) => {
               const el = (
                 <div className="column">
                   <Card

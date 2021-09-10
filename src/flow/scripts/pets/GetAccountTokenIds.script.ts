@@ -10,7 +10,8 @@ async function getAccountTokenIds(addr: string) {
             fcl.script(script),
             fcl.args([fcl.arg(addr, t.Address)])
         ]);
-        return await fcl.decode(encoded);
+        const ids = await fcl.decode(encoded);
+        return ids.sort((a: number, b: number) => a - b);
     } catch (err) {
         return { error: err };
     }

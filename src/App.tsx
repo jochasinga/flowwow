@@ -6,7 +6,7 @@ import Tiles from "Tiles";
 import getTokenMetadata from 'flow/scripts/pets/GetTokenMetadata.script';
 import * as fcl from "@onflow/fcl";
 import getAllExistingTokenIds from 'flow/scripts/pets/GetAllExistingTokenIds.script';
-import getAccountTokenIds from 'flow/scripts/pets/GetAccountTokenIds.script ';
+import getAccountTokenIds from 'flow/scripts/pets/GetAccountTokenIds.script';
 import data from "pets.json";
 import Pet from "pet";
 
@@ -43,19 +43,20 @@ function App() {
     }
 
     getIds();
+    // getPets();
   }, []);
 
-  useEffect(() => {
-    const getMetadata = async () => {
-      let pets = petIds.map(async (id: number) => {
-        let data = await getTokenMetadata(id);
-        return data;
-      });
-      let allPets = await Promise.all(pets);
-      setPets(allPets as any);
-    };
-    getMetadata();
-  }, [petIds]);
+//   useEffect(() => {
+//     const getMetadata = async () => {
+//       let pets = petIds.map(async (id: number) => {
+//         let data = await getTokenMetadata(id);
+//         return data;
+//       });
+//       let allPets = await Promise.all(pets);
+//       setPets(allPets as any);
+//     };
+//     getMetadata();
+//   }, [petIds]);
 
   return (
     <div className="App">
