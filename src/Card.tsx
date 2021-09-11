@@ -1,8 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import transferToken from "flow/transactions/pets/TransferToken.tx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWallet, faTimes, faStore, faBoxOpen } from "@fortawesome/free-solid-svg-icons";
-import { useEffect } from "react";
 import getTokenOwner from "flow/scripts/pets/GetTokenOwner.script";
 import * as fcl from "@onflow/fcl";
 import getAccountTokenIds from "flow/scripts/pets/GetAccountTokenIds.script";
@@ -12,7 +11,7 @@ import Pet from "pet";
 import mintPetToken from "flow/transactions/pets/MintPetToken.tx";
 import Loader from "Loader/Loader";
 import "./Card.scss";
-import {toTitleCase, objectsEqual} from "helpers";
+import { toTitleCase, objectsEqual } from "helpers";
 import getTokenMetadata from "flow/scripts/pets/GetTokenMetadata.script";
 import getAllTokenIds from "flow/scripts/pets/GetAllTokenIds.script";
 
@@ -27,56 +26,38 @@ interface CardProps {
 const Card = ({ pet, user, id, isActivated }: CardProps) => {
   let [currentUser, setUser] = useState(user);
   let [ownerAddress, setOwnerAddress] = useState(null);
-  let [ownerIsCurrentUser, setOwnerIsCurrentUser] = useState(false);
-  let [ownerIsContract, setOwnerIsContract] = useState(true);
   let [isMinted, setMinted] = useState(false);
   let [isMinting, setMinting] = useState(false);
+  let [isTransferring, setTransferring] = useState(false);
   let [tokenId, setTokenId] = useState(0);
 
-  const getNFTOwner = async (id: number) => {
-    console.log("getNFTOwner");
+  const setNFTOwnerOf = async (id: number) => {
     let addr: string | any = await getTokenOwner(id);
-    console.log(addr, " owns NFT ", id);
     if (addr?.error) {
       setMinted(false);
       setOwnerAddress("Not Minted" as any);
     } else {
       setMinted(true);
       setOwnerAddress(addr);
-      const tokenIds = await getAccountTokenIds(addr);
-      if (currentUser?.addr === ownerAddress) {
-        setOwnerIsCurrentUser(true);
-      } else if (currentUser?.addr == masterAccount) {
-        setOwnerIsContract(true);
-      } else {
-        setOwnerIsCurrentUser(false);
-      }
     }
   };
 
   const masterAccount = process.env.REACT_APP_EMULATOR_ACCOUNT;
   useEffect(() => {
-    getNFTOwner(id)
-
+    setNFTOwnerOf(id)
     fcl.currentUser().subscribe(setUser);
   }, []);
 
-  // useEffect(() => {
-
-  // }, [ownerAddress]);
-
-  const isMatchingTokenId = async (id: number, metadata: Pet) => {
+  const isMatchingTokenId = useCallback(async (id: number, metadata: Pet) => {
     let data = await getTokenMetadata(id);
-    console.log("pet data: ", data);
-    console.log("pet meta: ", metadata);
     const matched = objectsEqual(data as Pet, metadata);
-    console.log("matched?: ", matched);
     return matched;
-  }
+  }, [id, pet]);
 
   return (
     <div className="card">
       <Loader isActive={isMinting} message="✨ Minting... ✨" />
+      <Loader isActive={isTransferring} message="Transferring..." />
       <header className="card-header">
         <p className="card-header-title subtitle is-centered">
           {pet.name}
@@ -171,7 +152,7 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
             </tr>
           </thead>
           <tbody>
-            { Object.keys(pet).map((k, i) => {
+            {Object.keys(pet).map((k, i) => {
               if (!["photo", "uri"].includes(k)) {
                 return (
                   <tr key={i}>
@@ -201,33 +182,33 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
                 onClick={ownerAddress !== user.addr ?
                   (async () => {
                     if (isMinted && tokenId !== null) {
+                      setTransferring(true);
                       let txId = await transferToken(tokenId, user?.addr);
                       console.log(txId, user?.addr, " adopted ", pet.name);
                       setOwnerAddress(user.addr);
+                      setTransferring(false)
                     } else {
                       setMinting(true);
                       const data = await mintPetToken(pet);
                       let masterTokenIds = await getAllTokenIds();
-
                       masterTokenIds.forEach(async (id: number) => {
                         let matched = await isMatchingTokenId(id, pet);
                         if (matched) {
                           setTokenId(id);
                         }
                       });
-
-                      setOwnerIsContract(true);
                       setOwnerAddress(masterAccount as any);
                       setMinting(false);
                       setMinted(true);
                     }
                   }) : (
                     async () => {
+                      setTransferring(true);
                       let txId = await transferTokenToContract(tokenId);
                       console.log(txId, "transferred ", tokenId, " to ", masterAccount);
                       setOwnerAddress(masterAccount as any);
-                    }
-                  )
+                      setTransferring(false);
+                    })
                 }
               >
                 {ownerAddress !== user.addr
