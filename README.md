@@ -35,6 +35,9 @@ First, make sure you have installe [Flow CLI](https://docs.onflow.org/flow-cli/i
     - [ ] Account setup
     - [ ] Minting
     - [ ] Withdrawing and deposit
+- [ ] Storage
+    - [x] Store images on NFT Storage
+    - [ ] Store all metadata on NFT Storage (testnet or mainnet)
 
 ### Interacting with CLI
 
