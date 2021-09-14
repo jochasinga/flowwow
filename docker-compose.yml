@@ -1,6 +1,7 @@
 version: "3"
 services:
   wallet:
+    container_name: "fcl-dev-wallet"
     build: Dockerfile.wallet
     ports:
       - "8701:8701"
@@ -14,6 +15,7 @@ services:
       - FLOW_ACCOUNT_ADDRESS=0xf8d6e0586b0a20c7
       - FLOW_AVATAR_URL=https://avatars.onflow.org/avatar/
   emulator:
+    container_name: "flow-emulator"
     image: gcr.io/flow-container-registry/emulator:0.20.2
     ports:
       - "8080:8080"

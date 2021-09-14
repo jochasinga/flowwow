@@ -1,0 +1,16 @@
+[package]
+name = "api"
+version = "0.1.0"
+edition = "2018"
+authors = ["Pancy <pan@fil.org>"]
+description = "API service for the Flowwow pet store"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+axum = "0.2"
+tracing = "0.1"
+tracing-subscriber = "0.2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
