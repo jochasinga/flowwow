@@ -1,0 +1,28 @@
+{
+	"emulators": {
+		"default": {
+			"port": 3569,
+			"serviceAccount": "emulator-account"
+		}
+	},
+	"contracts": {
+		"PetShopContract": "./src/flow/contracts/PetShopContract.cdc"
+	},
+	"networks": {
+		"emulator": "127.0.0.1:3569",
+		"mainnet": "access.mainnet.nodes.onflow.org:9000",
+		"testnet": "access.devnet.nodes.onflow.org:9000"
+	},
+	"accounts": {
+		"emulator-account": {
+			"address": "f8d6e0586b0a20c7",
+			"key": "bd7a891abd496c9cf933214d2eab26b2a41d614d81fc62763d2c3f65d33326b0"
+		}
+	},
+	"deployments": {
+		"emulator": {
+			"emulator-account": ["PetShopContract"]
+		}
+	},
+    "app.detail.title": "Flowwow"
+}
