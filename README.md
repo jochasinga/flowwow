@@ -1,10 +1,12 @@
 # 🐶 Flowwow
 
-#### NFT Pet marketplace built on [Flow](https://onflow.org) and [NFT Storage](https://nft.storage).
+Flowwow is an NFT pet marketplace built on [Flow](https://onflow.org) and [NFT Storage](https://nft.storage). It is intended to be a demo of how to mint and manage NFTs on the Flow blockchain, storing them in IPFS and Filecoin via the NFT.storage service. You can browse delightful pets, adopt them (transfer from marketplace to your wallet), and release them (transfer from your wallet back to the marketplace).
+
+### Prerequisites
+
+First, make sure you install [Flow CLI](https://docs.onflow.org/flow-cli/install/) and sign up for a [NFT.storage](https://nft.storage) account to get the API token. You will also need to have [Docker](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
 
 ### Get Started
-
-First, make sure you have installe [Flow CLI](https://docs.onflow.org/flow-cli/install/) and sign up for [NFT.storage](https://nft.storage) account to get the API token. You will also need to have [Docker](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
 
 1. Run the Flow chain emulator and the local dev wallet with `docker-compose up`
 
@@ -60,4 +62,4 @@ Mint a new NFT of your own. Check out [`pets.json`](./pets.json) to get the idea
 
 ## Copyrights
 
-Dog and cat photos from Unsplash.
+Dual-licensed under MIT and Apache 2. Dog and cat photos from Unsplash.
