@@ -1,4 +1,4 @@
-nversion: "3"
+version: "3"
 services:
   web:
     container_name: "web"
