@@ -1,5 +1,12 @@
-version: "3"
+nversion: "3"
 services:
+  web:
+    container_name: "web"
+    build: 
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "3000:3000"
   wallet:
     container_name: "fcl-dev-wallet"
     build: Dockerfile.wallet
