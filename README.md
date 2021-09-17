@@ -8,22 +8,15 @@ First, make sure you install [Flow CLI](https://docs.onflow.org/flow-cli/install
 
 ### Get Started
 
-1. Run the Flow chain emulator and the local dev wallet with `docker-compose up`
+1. Run the Flow chain emulator, local dev wallet, and the React app with `docker-compose up`
 
 2. Deploy the [`PetshopContract`](./src/flow/contracts/PetshopContract.cdc) with `flow project deploy`
 
-3. Optional: Pre-mint the NFTs
-    - Add NFT storage API key in the `.env.local` file with `REACT_APP_NFTSTORAGE_API_KEY={your API token}`
-    - Mint the NFTs with `npm run mint-tokens`, which run the program in [`/minter`](./minter) that serializes [`pets.json`](./pets.json) and send transactions over to the local emulator and uploading images to NFT storage.
-    - Alternatively, if you're adding the key to a different `.env.*` file, make sure to provide the path to the file with `ENVFILE={.env.*} npm run mint-tokens`.
+3. Go to `http://localhost:3000`
 
 4. Click Login or Signup button to connect to a local dev wallet, which will let you choose an account. You can choose a separate account from the emulator (service account) or create new ones. Then, select "Activate Collection" under the dropdown menu for every new account.
 
 5. Try minting, adopting (transfer from marketplace to you), and releasing (transferring back to the marketplace) pet NFTs.
-
-> 💡 Pre-minting all pets with the command line will mint and deposit them to the emulator's (service account's) address, ready to be transferred to another logged in account.
->
-> Without the pre-minting, the logged in user will be able to mint each pet individually.
 
 ### Features
 - [ ] **Authentication**
