@@ -44,12 +44,12 @@ const Nav = ({setActivated}: any) => {
                 <AuthCluster setActivated={setActivated} />
               </div>
             <span className="navbar-item">
-              <button className="button is-light">
+              <a className="button is-light" href="https://github.com/jochasinga/flowwow">
                 <span className="icon">
                   <FontAwesomeIcon icon={faGithub} size="1x" />
                 </span>
                 <span>Fork</span>
-              </button>
+              </a>
             </span>
           </div>
         </div>
