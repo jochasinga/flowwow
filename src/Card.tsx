@@ -14,6 +14,9 @@ import "./Card.scss";
 import { toTitleCase, objectsEqual } from "helpers";
 import getTokenMetadata from "flow/scripts/pets/GetTokenMetadata.script";
 import getAllTokenIds from "flow/scripts/pets/GetAllTokenIds.script";
+import {ipfsToWeb2Url} from "helpers";
+import { NFTStorageToken } from "storage";
+import { NFTStorage } from "nft.storage";
 
 interface CardProps {
   pet: Pet,
@@ -183,13 +186,19 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
                   (async () => {
                     if (isMinted && tokenId !== null) {
                       setTransferring(true);
-                      let txId = await transferToken(tokenId, user?.addr);
-                      console.log(txId, user?.addr, " adopted ", pet.name);
+                      let _ = await transferToken(tokenId, user?.addr);
                       setOwnerAddress(user.addr);
                       setTransferring(false)
                     } else {
                       setMinting(true);
-                      const data = await mintPetToken(pet);
+                      try {
+                        const data: NFTStorageToken = await mintPetToken(pet);
+                        let ipfsPetData = await (await fetch(data.web2Url!)).json();
+                        // TODO: Update the pet state using the new data
+                      } catch (err) {
+                        console.error(err);
+                      }
+
                       let masterTokenIds = await getAllTokenIds();
                       masterTokenIds.forEach(async (id: number) => {
                         let matched = await isMatchingTokenId(id, pet);
