@@ -27,12 +27,17 @@ interface CardProps {
 }
 
 const Card = ({ pet, user, id, isActivated }: CardProps) => {
-  let [currentUser, setUser] = useState(user);
+  let [_, setUser] = useState(user);
   let [ownerAddress, setOwnerAddress] = useState(null);
   let [isMinted, setMinted] = useState(false);
   let [isMinting, setMinting] = useState(false);
   let [isTransferring, setTransferring] = useState(false);
   let [tokenId, setTokenId] = useState(0);
+
+  const masterAccount = process.env.REACT_APP_EMULATOR_ACCOUNT!;
+  const currentUserIsOwner = () => ownerAddress == user?.addr;
+  const storeIsOwner = () => ownerAddress === masterAccount;
+  const notMinted = () => ownerAddress === "Not Minted"
 
   const setNFTOwnerOf = async (id: number) => {
     let addr: string | any = await getTokenOwner(id);
@@ -45,7 +50,6 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
     }
   };
 
-  const masterAccount = process.env.REACT_APP_EMULATOR_ACCOUNT;
   useEffect(() => {
     setNFTOwnerOf(id)
     fcl.currentUser().subscribe(setUser);
@@ -78,12 +82,12 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
               <>
                 <span className={
                   `tag is-rounded is-medium
-                    ${ownerAddress === currentUser?.addr && "is-primary is-light"}`
+                    ${currentUserIsOwner() && "is-primary is-light"}`
                 }>
                   <FontAwesomeIcon
-                    icon={ownerAddress === masterAccount
+                    icon={storeIsOwner()
                       ? faStore
-                      : ownerAddress === "Not Minted"
+                      : notMinted()
                         ? faBoxOpen
                         : faWallet
                     }
@@ -94,11 +98,11 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
 
                 <Tippy
                   className="floating"
-                  content={ownerAddress === currentUser?.addr
+                  content={currentUserIsOwner()
                     ? "This is your account"
-                    : ownerAddress === masterAccount
+                    : storeIsOwner()
                       ? "This is the marketplace's account"
-                      : ownerAddress === "Not Minted"
+                      : notMinted()
                         ? "Be the first to mint"
                         : "This is another user's account"
                   }
@@ -108,7 +112,7 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
                 >
                   <span className={
                     `tag is-rounded is-medium has-text-weight-medium
-                      ${ownerAddress === currentUser?.addr ? "is-primary" : "is-info"}`
+                      ${currentUserIsOwner() ? "is-primary" : "is-info"}`
                   }>{ownerAddress}</span>
                 </Tippy>
               </>
@@ -116,9 +120,9 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
               <>
                 <span className="tag is-rounded is-medium">
                   <FontAwesomeIcon icon={
-                    ownerAddress === masterAccount
+                    storeIsOwner()
                       ? faStore
-                      : ownerAddress == "Not Minted"
+                      : notMinted()
                         ? faBoxOpen
                         : faWallet
                   } size="1x" />
@@ -126,11 +130,11 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
                 </span>
                 <Tippy
                   className="floating"
-                  content={ownerAddress === currentUser?.addr
+                  content={currentUserIsOwner()
                     ? "This is your account"
-                    : ownerAddress === masterAccount
+                    : storeIsOwner()
                       ? "This is the marketplace's account"
-                      : ownerAddress === "Not Minted"
+                      : notMinted()
                         ? "Be the first to mint"
                         : "This is another user's account"
                   }
@@ -180,7 +184,7 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
                 className={
                   `card-footer-item button subtitle
                   ${ownerAddress === user.addr ? "is-info" : "is-dark"}
-                  ${ownerAddress === "Not Minted" && "mint-button"}`
+                  ${notMinted() && "mint-button"}`
                 }
                 onClick={ownerAddress !== user.addr ?
                   (async () => {
@@ -225,9 +229,9 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
                   && ownerAddress !== "Not Minted"
                   ? <span>Not Available</span>
                   : <span>{
-                    ownerAddress === currentUser?.addr
+                    currentUserIsOwner()
                       ? "Release 👋"
-                      : ownerAddress === "Not Minted"
+                      : notMinted()
                         ? "Mint ✨"
                         : "Adopt ❤️"
                   }</span>
