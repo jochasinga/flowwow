@@ -28,6 +28,8 @@ interface CardProps {
 
 const Card = ({ pet, user, id, isActivated }: CardProps) => {
   let [_, setUser] = useState(user);
+  // The scoped pet state so we can update it internally.
+  let [_pet, _setPet] = useState(pet);
   let [ownerAddress, setOwnerAddress] = useState(null);
   let [isMinted, setMinted] = useState(false);
   let [isMinting, setMinting] = useState(false);
@@ -59,7 +61,7 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
     let data = await getTokenMetadata(id);
     const matched = objectsEqual(data as Pet, metadata);
     return matched;
-  }, [id, pet]);
+  }, [id, _pet]);
 
   return (
     <div className="card">
@@ -67,12 +69,12 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
       <Loader isActive={isTransferring} message="Transferring..." />
       <header className="card-header">
         <p className="card-header-title subtitle is-centered">
-          {pet.name}
+          {_pet.name}
         </p>
       </header>
       <div className="card-image">
         <figure className="image is-4by4">
-          <img src={pet.uri || pet.photo} alt="Pet image" />
+          <img src={_pet.uri || _pet.photo} alt="Pet image" />
         </figure>
       </div>
       <div className="card-content is-flex" style={{ flexDirection: "column" }}>
@@ -197,8 +199,12 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
                       setMinting(true);
                       try {
                         const data: NFTStorageToken = await mintPetToken(pet);
+
+                        // After upload, fetch the data from IPFS and use it on the 
+                        // UI instead of the one from the filesystem.
                         let ipfsPetData = await (await fetch(data.web2Url!)).json();
-                        // TODO: Update the pet state using the new data
+                        let web2ImageUrl = ipfsToWeb2Url(ipfsPetData.image);
+                        _setPet({ ...ipfsPetData, photo: web2ImageUrl });
                       } catch (err) {
                         console.error(err);
                       }
