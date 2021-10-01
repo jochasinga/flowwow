@@ -8,6 +8,8 @@ interface  Pet {
     kind: string;
     photo?: string;
     uri?: string;
+    ownerAddress?: string;
+    isMinted?: boolean;
 }
 
 export const petToCadenceDict = (pet: any) => (

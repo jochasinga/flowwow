@@ -1,22 +1,27 @@
 import { useState, useEffect, useCallback } from "react";
-import transferToken from "flow/transactions/pets/TransferToken.tx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWallet, faTimes, faStore, faBoxOpen } from "@fortawesome/free-solid-svg-icons";
-import getTokenOwner from "flow/scripts/pets/GetTokenOwner.script";
+
 import * as fcl from "@onflow/fcl";
-import getAccountTokenIds from "flow/scripts/pets/GetAccountTokenIds.script";
 import Tippy from "@tippyjs/react";
-import transferTokenToContract from "flow/transactions/pets/TransferTokenToContract.tx";
-import Pet from "pet";
+
+import getAccountTokenIds from "flow/scripts/pets/GetAccountTokenIds.script";
 import mintPetToken from "flow/transactions/pets/MintPetToken.tx";
-import Loader from "Loader/Loader";
-import "./Card.scss";
-import { toTitleCase, objectsEqual } from "helpers";
+import transferTokenToContract from "flow/transactions/pets/TransferTokenToContract.tx";
+import transferToken from "flow/transactions/pets/TransferToken.tx";
+import getTokenOwner from "flow/scripts/pets/GetTokenOwner.script";
 import getTokenMetadata from "flow/scripts/pets/GetTokenMetadata.script";
 import getAllTokenIds from "flow/scripts/pets/GetAllTokenIds.script";
+import getAllExistingTokenIds from "flow/scripts/pets/GetAllExistingTokenIds.script";
 import {ipfsToWeb2Url} from "helpers";
 import { NFTStorageToken } from "storage";
-import { NFTStorage } from "nft.storage";
+
+import "./Card.scss";
+import Pet from "pet";
+import Loader from "Loader/Loader";
+import { toTitleCase, objectsEqual } from "helpers";
+import { Action as AppAction, useAppState } from "state/app";
+import App from "App";
 
 interface CardProps {
   pet: Pet,
@@ -27,14 +32,16 @@ interface CardProps {
 }
 
 const Card = ({ pet, user, id, isActivated }: CardProps) => {
-  let [_, setUser] = useState(user);
+  const [_appState, appDispatch] = useAppState();
+  let [_userState, setUser] = useState(user);
   // The scoped pet state so we can update it internally.
   let [_pet, _setPet] = useState(pet);
   let [ownerAddress, setOwnerAddress] = useState(null);
   let [isMinted, setMinted] = useState(false);
-  let [isMinting, setMinting] = useState(false);
-  let [isTransferring, setTransferring] = useState(false);
   let [tokenId, setTokenId] = useState(0);
+
+  let toggleMinting = () => appDispatch(AppAction.ToggleMinting);
+  let toggleTransferring = () => appDispatch(AppAction.ToggleTransferring);
 
   const masterAccount = process.env.REACT_APP_EMULATOR_ACCOUNT!;
   const currentUserIsOwner = () => ownerAddress == user?.addr;
@@ -65,8 +72,6 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
 
   return (
     <div className="card">
-      <Loader isActive={isMinting} message="✨ Minting... ✨" />
-      <Loader isActive={isTransferring} message="Transferring..." />
       <header className="card-header">
         <p className="card-header-title subtitle is-centered">
           {_pet.name}
@@ -83,7 +88,7 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
             {user?.loggedIn ? (
               <>
                 <span className={
-                  `tag is-rounded is-medium
+                  `tag is-rounded is-small
                     ${currentUserIsOwner() && "is-primary is-light"}`
                 }>
                   <FontAwesomeIcon
@@ -113,14 +118,14 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
                   inertia
                 >
                   <span className={
-                    `tag is-rounded is-medium has-text-weight-medium
+                    `tag is-rounded is-small has-text-weight-medium
                       ${currentUserIsOwner() ? "is-primary" : "is-info"}`
                   }>{ownerAddress}</span>
                 </Tippy>
               </>
             ) : (
               <>
-                <span className="tag is-rounded is-medium">
+                <span className="tag is-rounded is-small">
                   <FontAwesomeIcon icon={
                     storeIsOwner()
                       ? faStore
@@ -144,7 +149,7 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
                   theme="light"
                   inertia
                 >
-                  <span className="tag is-rounded is-info is-medium has-text-weight-medium">
+                  <span className="tag is-rounded is-info is-small has-text-weight-medium">
                     {ownerAddress}
                   </span>
                 </Tippy>
@@ -155,7 +160,7 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
         </div>
         <table className="table is-striped is-full-width">
           <thead>
-            <tr>
+            <tr className="is-size-7">
               <th>Fields</th>
               <th>Characteristics</th>
             </tr>
@@ -164,9 +169,9 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
             {Object.keys(pet).map((k, i) => {
               if (!["photo", "uri"].includes(k)) {
                 return (
-                  <tr key={i}>
-                    <td>{toTitleCase(k)}</td>
-                    <td>{toTitleCase((pet as any)[k])}</td>
+                  <tr key={i} className="is-size-7">
+                    <td>{toTitleCase(k)!}</td>
+                    <td>{toTitleCase((pet as any)[k]!)}</td>
                   </tr>
                 );
               }
@@ -191,20 +196,37 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
                 onClick={ownerAddress !== user.addr ?
                   (async () => {
                     if (isMinted && tokenId !== null) {
-                      setTransferring(true);
+                      // setTransferring(true);
+                      toggleTransferring();
                       let _ = await transferToken(tokenId, user?.addr);
                       setOwnerAddress(user.addr);
-                      setTransferring(false)
+                      // setTransferring(false)
+                      toggleTransferring();
                     } else {
-                      setMinting(true);
+                      // setMinting(true);
+                      toggleMinting();
                       try {
+                        const currentTokenIds = await getAllExistingTokenIds();
                         const data: NFTStorageToken = await mintPetToken(pet);
+                        const newTokenIds = await getAllExistingTokenIds();
+                        if (newTokenIds.length <= currentTokenIds.length) {
+                          throw new Error("New token IDs cannot be equal or less than previous token IDs");
+                        }
 
-                        // After upload, fetch the data from IPFS and use it on the 
+                        const latestTokenId = newTokenIds.pop();
+
+
+                        // After upload, fetch the data from IPFS and use it on the
                         // UI instead of the one from the filesystem.
                         let ipfsPetData = await (await fetch(data.web2Url!)).json();
                         let web2ImageUrl = ipfsToWeb2Url(ipfsPetData.image);
-                        _setPet({ ...ipfsPetData, photo: web2ImageUrl });
+                        _setPet({
+                          ...ipfsPetData,
+                          id: latestTokenId,
+                          photo: web2ImageUrl,
+                          isMinted: true,
+                          ownerAddress: null,
+                        });
                       } catch (err) {
                         console.error(err);
                       }
@@ -217,16 +239,19 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
                         }
                       });
                       setOwnerAddress(masterAccount as any);
-                      setMinting(false);
+                      // setMinting(false);
+                      toggleMinting();
                       setMinted(true);
                     }
                   }) : (
                     async () => {
-                      setTransferring(true);
+                      // setTransferring(true);
+                      toggleTransferring();
                       let txId = await transferTokenToContract(tokenId);
                       console.log(txId, "transferred ", tokenId, " to ", masterAccount);
                       setOwnerAddress(masterAccount as any);
-                      setTransferring(false);
+                      // setTransferring(false);
+                      toggleTransferring();
                     })
                 }
               >

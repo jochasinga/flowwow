@@ -1,20 +1,42 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useCallback, useState, useReducer } from 'react';
 import 'App.css';
 import 'theme.scss';
 import Hero from "Hero";
 import Tiles from "Tiles";
-import getTokenMetadata from 'flow/scripts/pets/GetTokenMetadata.script';
 import * as fcl from "@onflow/fcl";
 import getAllExistingTokenIds from 'flow/scripts/pets/GetAllExistingTokenIds.script';
 import getAccountTokenIds from 'flow/scripts/pets/GetAccountTokenIds.script';
-import data from "pets.json";
 import Pet from "pet";
+import {
+  reducer as petsReducer,
+  initializeState as initPets,
+  ActionType,
+} from "state/pets";
+import {
+  reducer as appReducer,
+  initializeState as initApp,
+  Action as AppAction,
+  AppStateProvider,
+  useAppState,
+} from "state/app";
+import Loader from "Loader/Loader";
 
-function App() {
-  const [pets, setPets] = useState([]);
+function Body() {
+  const [{ isMinting, isTransferring }, _] = useAppState();
+  const [pets, dispatch] = useReducer(petsReducer, initPets());
+  const [unminted, setUnmintedPets] = useState(pets);
+  const [minted, setMintedPets] = useState([]);
+  const setPets = useCallback((pets: Pet[]) => {
+    dispatch({
+      type: ActionType.Set,
+      payload: pets,
+    });
+  }, []);
+
   const [petIds, setPetIds] = useState([]);
   const [user, setUser] = useState(null);
   const [isActivated, setActivated] = useState(false);
+
   useEffect(() => {
     fcl.currentUser().subscribe(async (user: any) => {
       setUser(user);
@@ -31,41 +53,49 @@ function App() {
     const getIds = async () => {
       let ids = await getAllExistingTokenIds();
       if (ids.length == 0) {
-          await getPets();
-          return;
+        setPets(initPets());
+        return;
       }
-      setPetIds(ids);
     };
-
-    const getPets = async () => {
-        let pets = data.pets;
-        setPets(pets as any);
-    }
-
     getIds();
-    // getPets();
   }, []);
 
-//   useEffect(() => {
-//     const getMetadata = async () => {
-//       let pets = petIds.map(async (id: number) => {
-//         let data = await getTokenMetadata(id);
-//         return data;
-//       });
-//       let allPets = await Promise.all(pets);
-//       setPets(allPets as any);
-//     };
-//     getMetadata();
-//   }, [petIds]);
+  useEffect(() => {
+    let minted: Pet[] = pets.filter(pet => (pet?.id && pet?.id > 0) || pet?.isMinted);
+    let unminted: Pet[] = pets.filter(pet => pet.id === undefined || pet.id === null);
+    setMintedPets(minted as any);
+    setUnmintedPets(unminted);
+  }, [pets]);
+  return (
+    <>
+      <Loader isActive={isMinting} message="✨ Minting... ✨" />
+      <Loader isActive={isTransferring} message="Transferring..." />
+      <Hero setActivated={setActivated} />
+      <Tiles
+        pets={unminted}
+        user={user}
+        isActivated={isActivated}
+        heading="Just Dropped 📦"
+      />
+      <Tiles
+        pets={minted}
+        user={user}
+        isActivated={isActivated}
+        heading="Available Now 🔥"
+      />
+    </>
+  );
+}
+
+
+function App() {
+
 
   return (
     <div className="App">
-      <Hero setActivated={setActivated} />
-      <Tiles
-        pets={pets}
-        user={user}
-        isActivated={isActivated}
-      />
+      <AppStateProvider>
+        <Body />
+      </AppStateProvider>
     </div>
   );
 }
