@@ -3,7 +3,6 @@ import * as t from "@onflow/types";
 import raw from "./GetAccountTokenIds.cdc";
 
 async function getAccountTokenIds(addr: string) {
-    console.log("Address is ", addr);
     try {
         let script = await(await fetch(raw)).text();
         const encoded = await fcl.send([

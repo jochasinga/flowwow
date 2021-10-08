@@ -49,15 +49,12 @@ function Tiles({ pets, user, isActivated, heading }: TilesProps) {
   let counter = 1;
 
   const settings = (hide: boolean) => ({
-    dots: false,
     infinite: true,
     arrows: true,
     speed: 500,
     slidesToShow: 4,
     slidesToScroll: 1,
-    initialSlide: 0,
-    // className: "center",
-    // centerMode: true,
+    initialSlide: 4,
     nextArrow: <SlideArrow direction="right" hide={hide} />,
     prevArrow: <SlideArrow direction="left" hide={hide} />,
     responsive: [
@@ -98,24 +95,38 @@ function Tiles({ pets, user, isActivated, heading }: TilesProps) {
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
         >
-          {/* <div className="columns block" ref={slideRef}> */}
           <Slider {...settings(hover)} className="columns block">
             {
-              pets.map((pet: Pet) => {
-                const el = (
-                  <div className="column is-mobile">
-                    <Card
-                      pet={pet}
-                      key={counter}
-                      id={counter}
-                      user={user}
-                      isActivated={isActivated}
-                    />
-                  </div>
-                );
-                counter += 1;
-                return el;
-              })
+              [
+                pets.map((pet: Pet) => {
+                  const el = (
+                    <div className="column">
+                      <Card
+                        pet={pet}
+                        key={counter}
+                        id={counter}
+                        user={user}
+                        isActivated={isActivated}
+                      />
+                    </div>
+                  );
+                  counter += 1;
+                  return el;
+                }),
+                ...Array.from({length: 4}, (x, i) => i)
+                  .map((i) => {
+                    <div className="column">
+                      <Card
+                        pet={{name: ""} as any}
+                        key={counter}
+                        id={counter}
+                        user={user}
+                        isActivated={isActivated} 
+                        empty={true} 
+                      />
+                    </div>
+                  })
+              ]
             }
           </Slider>
           {/* </div> */}

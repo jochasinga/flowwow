@@ -13,7 +13,7 @@ import getTokenOwner from "flow/scripts/pets/GetTokenOwner.script";
 import getTokenMetadata from "flow/scripts/pets/GetTokenMetadata.script";
 import getAllTokenIds from "flow/scripts/pets/GetAllTokenIds.script";
 import getAllExistingTokenIds from "flow/scripts/pets/GetAllExistingTokenIds.script";
-import {ipfsToWeb2Url} from "helpers";
+import { ipfsToWeb2Url } from "helpers";
 import { NFTStorageToken } from "storage";
 
 import "./Card.scss";
@@ -22,6 +22,7 @@ import Loader from "Loader/Loader";
 import { toTitleCase, objectsEqual } from "helpers";
 import { Action as AppAction, useAppState } from "state/app";
 import App from "App";
+import { ActionType as PetActionType, usePetsState } from "state/pets";
 
 interface CardProps {
   pet: Pet,
@@ -29,13 +30,78 @@ interface CardProps {
   id: number,
   isActivated: boolean,
   isMinted?: boolean,
+  empty?: boolean,
 }
 
-const Card = ({ pet, user, id, isActivated }: CardProps) => {
+const Header = ({ name }: { name: string }) => (
+  <header className="card-header">
+    <p className="card-header-title subtitle is-centered">
+      {name}
+    </p>
+  </header>
+);
+
+const Photo = ({ src }: { src: string }) => (
+  <div className="card-image">
+    <figure className="image is-4by4">
+      <img src={src} alt="Pet image" />
+    </figure>
+  </div>
+);
+
+const Table = ({ pet }: { pet: Pet }) => (
+  <table className="table is-striped is-fullwidth">
+    <thead>
+      <tr className="is-size-7">
+        <th>Fields</th>
+        <th>Characteristics</th>
+      </tr>
+    </thead>
+    <tbody>
+      {Object.keys(pet).map((k, i) => {
+        if (["age", "breed", "kind", "sex", "name", "photo", "color"].includes(k)) {
+          return (
+            <tr key={i} className="is-size-7">
+              <td>{toTitleCase(k)!}</td>
+              <td>{toTitleCase((pet as any)[k]! as string)}</td>
+            </tr>
+          );
+        }
+      })}
+    </tbody>
+  </table>
+);
+
+const Card = ({ pet, user, id, isActivated, empty }: CardProps) => {
   const [_appState, appDispatch] = useAppState();
   let [_userState, setUser] = useState(user);
   // The scoped pet state so we can update it internally.
-  let [_pet, _setPet] = useState(pet);
+  // let [_pet, _setPet] = useState(pet);
+
+  let [_pets, petDispatch] = usePetsState();
+
+  let updatePet = (id: number, data: Pet | any) => {
+    const payload = { id, data };
+    console.log('payload: ', payload);
+    const newPets = _pets.map((pet: Pet) => {
+      if (pet.name === data?.name) {
+        return data;
+      }
+      return pet;
+    });
+
+    console.log('newPets :', newPets);
+    // petDispatch({
+    //   type: PetActionType.Update,
+    //   payload,
+    // });
+    petDispatch({
+      type: PetActionType.Set,
+      payload: newPets,
+    });
+  };
+
+
   let [ownerAddress, setOwnerAddress] = useState(null);
   let [isMinted, setMinted] = useState(false);
   let [tokenId, setTokenId] = useState(0);
@@ -68,21 +134,17 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
     let data = await getTokenMetadata(id);
     const matched = objectsEqual(data as Pet, metadata);
     return matched;
-  }, [id, _pet]);
+  }, [id, pet]);
 
-  return (
+  return !empty ? (
     <div className="card">
-      <header className="card-header">
-        <p className="card-header-title subtitle is-centered">
-          {_pet.name}
-        </p>
-      </header>
-      <div className="card-image">
-        <figure className="image is-4by4">
-          <img src={_pet.uri || _pet.photo} alt="Pet image" />
-        </figure>
-      </div>
-      <div className="card-content is-flex" style={{ flexDirection: "column" }}>
+      <Header name={pet.name} />
+      <Photo src={pet.uri || pet.photo!} />
+
+      <div 
+        className="card-content is-flex" 
+        style={{ flexDirection: "column" }}
+      >
         <div className="level">
           <div className="tags has-addons level-item has-text-centered">
             {user?.loggedIn ? (
@@ -158,26 +220,10 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
             }
           </div>
         </div>
-        <table className="table is-striped is-full-width">
-          <thead>
-            <tr className="is-size-7">
-              <th>Fields</th>
-              <th>Characteristics</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.keys(pet).map((k, i) => {
-              if (!["photo", "uri"].includes(k)) {
-                return (
-                  <tr key={i} className="is-size-7">
-                    <td>{toTitleCase(k)!}</td>
-                    <td>{toTitleCase((pet as any)[k]!)}</td>
-                  </tr>
-                );
-              }
-            })}
-          </tbody>
-        </table>
+        <div className="level">
+          <Table pet={pet} />
+        </div>
+
 
         {user?.loggedIn &&
           <footer className="card-footer cta-container">
@@ -203,7 +249,6 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
                       // setTransferring(false)
                       toggleTransferring();
                     } else {
-                      // setMinting(true);
                       toggleMinting();
                       try {
                         const currentTokenIds = await getAllExistingTokenIds();
@@ -215,18 +260,32 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
 
                         const latestTokenId = newTokenIds.pop();
 
-
                         // After upload, fetch the data from IPFS and use it on the
                         // UI instead of the one from the filesystem.
                         let ipfsPetData = await (await fetch(data.web2Url!)).json();
+                        console.log('ipfsPetData: ', ipfsPetData);
+
                         let web2ImageUrl = ipfsToWeb2Url(ipfsPetData.image);
-                        _setPet({
+
+                        console.log('web2ImageUrl: ', web2ImageUrl);
+                        const newPet = {
                           ...ipfsPetData,
                           id: latestTokenId,
                           photo: web2ImageUrl,
                           isMinted: true,
                           ownerAddress: null,
-                        });
+                        };
+
+                        console.log('newPet: ', newPet);
+
+                        updatePet(latestTokenId, newPet);
+                        // _setPet({
+                        //   ...ipfsPetData,
+                        //   id: latestTokenId,
+                        //   photo: web2ImageUrl,
+                        //   isMinted: true,
+                        //   ownerAddress: null,
+                        // });
                       } catch (err) {
                         console.error(err);
                       }
@@ -282,6 +341,10 @@ const Card = ({ pet, user, id, isActivated }: CardProps) => {
           </footer>
         }
       </div>
+    </div>
+  ) : (
+    <div className="card">
+      <p className="subtitle">Nothing to see here</p>
     </div>
   );
 }

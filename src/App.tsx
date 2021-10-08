@@ -11,6 +11,8 @@ import {
   reducer as petsReducer,
   initializeState as initPets,
   ActionType,
+  PetsStateProvider,
+  usePetsState,
 } from "state/pets";
 import {
   reducer as appReducer,
@@ -23,9 +25,11 @@ import Loader from "Loader/Loader";
 
 function Body() {
   const [{ isMinting, isTransferring }, _] = useAppState();
-  const [pets, dispatch] = useReducer(petsReducer, initPets());
+  const [pets, dispatch] = usePetsState();
+  // const [pets, dispatch] = useReducer(petsReducer, initPets());
   const [unminted, setUnmintedPets] = useState(pets);
   const [minted, setMintedPets] = useState([]);
+
   const setPets = useCallback((pets: Pet[]) => {
     dispatch({
       type: ActionType.Set,
@@ -61,8 +65,13 @@ function Body() {
   }, []);
 
   useEffect(() => {
-    let minted: Pet[] = pets.filter(pet => (pet?.id && pet?.id > 0) || pet?.isMinted);
-    let unminted: Pet[] = pets.filter(pet => pet.id === undefined || pet.id === null);
+    let minted: Pet[] = pets.filter((pet : any) => (pet?.id && pet?.id > 0) || pet?.isMinted);
+    let unminted: Pet[] = pets.filter((pet : any) => pet.id === undefined || pet.id === null);
+
+    console.log('minted: ', minted);
+
+    console.log('unminted: ', unminted);
+
     setMintedPets(minted as any);
     setUnmintedPets(unminted);
   }, [pets]);
@@ -94,7 +103,9 @@ function App() {
   return (
     <div className="App">
       <AppStateProvider>
-        <Body />
+        <PetsStateProvider>
+          <Body />
+        </PetsStateProvider>
       </AppStateProvider>
     </div>
   );

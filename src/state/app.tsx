@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useContext } from "react";
+import { createContext, useReducer, useContext } from "react";
 
 export interface AppState {
   isMinting: boolean;
@@ -53,6 +53,5 @@ export enum Action {
 
 export const useAppState = () => {
   const { state, dispatch } = useContext(AppStateContext);
-  console.log('state: ', state);
   return [state, dispatch];
 }

@@ -74,7 +74,9 @@ pub contract PetShopContract {
             // return self.ownedNFTs[id]?.metadata!
              // let token <- self.ownedNFTs[id]!
             // return token.metadata
-            return self.metadataObjs[id]!
+            var metadata = self.metadataObjs[id]!
+            metadata["id"] = id.toString()
+            return metadata
         }
 
         pub fun updateMetadata(id: UInt64, metadata: {String: String}) {
