@@ -2,13 +2,15 @@ version: "3"
 services:
   web:
     container_name: "web"
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile.web
     ports:
       - "3000:3000"
   wallet:
-    build: Dockerfile.wallet
+    build:
+      context: .
+      dockerfile: Dockerfile.wallet
     ports:
       - "8701:8701"
     environment:
