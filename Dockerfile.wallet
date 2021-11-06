@@ -1,5 +1,5 @@
 # Install dependencies only when needed
-FROM node:alpine AS deps
+FROM node:erbium-alpine3.13 AS deps
 
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
@@ -22,7 +22,7 @@ COPY --from=deps /app/.env.local .
 RUN npm run build && npm install --production --ignore-scripts
 
 # Production image, copy all the files and run next
-FROM node:alpine AS runners
+FROM node:erbium-alpine3.13 AS runners
 
 WORKDIR /app
 
